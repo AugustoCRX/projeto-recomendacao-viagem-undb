@@ -1,0 +1,15 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.planning  { background: #dbeafe; color: #1d4ed8; }
+.confirmed { background: #dcfce7; color: #15803d; }
+.ongoing   { background: #fef3c7; color: #b45309; }
+.completed { background: #f1f5f9; color: #475569; }
+.cancelled { background: #fee2e2; color: #b91c1c; }
