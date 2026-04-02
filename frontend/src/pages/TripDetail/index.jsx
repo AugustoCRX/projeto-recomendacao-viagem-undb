@@ -1,0 +1,170 @@
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { PageLayout } from '@/components/layout';
+import { Button, Badge, Spinner } from '@/components/ui';
+import { PlaceCard } from '@/features/places/components/PlaceCard';
+import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
+import { useDestinationPhoto } from '@/features/trips/hooks/useDestinationPhoto';
+import { usePlaces } from '@/features/places/hooks/usePlaces';
+import { ROUTES } from '@/constants';
+import { formatDate, formatCurrency, daysBetween } from '@/utils';
+import styles from './TripDetail.module.css';
+
+const PLACE_TYPES = [
+  { label: '🏛️ Atrações', value: 'tourist_attraction' },
+  { label: '🍽️ Restaurantes', value: 'restaurant' },
+  { label: '🏨 Hospedagem', value: 'lodging' },
+];
+
+export default function TripDetailPage() {
+  const { id } = useParams();
+  const { trip, loading, error } = useTripDetail(id);
+  const { photo, fallback } = useDestinationPhoto(trip?.destination);
+  const [placeType, setPlaceType] = useState('tourist_attraction');
+  const { places, loading: placesLoading, source } = usePlaces(trip?.destination, placeType);
+
+  if (loading) return <PageLayout><Spinner center /></PageLayout>;
+
+  if (error || !trip) {
+    return (
+      <PageLayout>
+        <p>Viagem não encontrada.</p>
+        <Button as={Link} to={ROUTES.TRIPS} variant="secondary">
+          Voltar para minhas viagens
+        </Button>
+      </PageLayout>
+    );
+  }
+
+  const coverStyle = trip.coverPhoto
+    ? { backgroundImage: `url(${trip.coverPhoto})` }
+    : photo?.type === 'image'
+    ? { backgroundImage: `url(${photo.value})` }
+    : { background: photo?.value ?? fallback };
+
+  const days =
+    trip.startDate && trip.endDate
+      ? daysBetween(trip.startDate, trip.endDate)
+      : null;
+
+  return (
+    <PageLayout>
+      <div className={styles.backBtn}>
+        <Button as={Link} to={ROUTES.TRIPS} variant="ghost" size="sm">
+          ← Minhas Viagens
+        </Button>
+      </div>
+
+      {/* Hero */}
+      <div className={styles.hero} style={coverStyle}>
+        <div className={styles.heroOverlay}>
+          <div className={styles.heroContent}>
+            <h1 className={styles.heroTitle}>{trip.name}</h1>
+            <p className={styles.heroSubtitle}>
+              📍 {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.layout}>
+        {/* Coluna principal — lugares */}
+        <div>
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              🗺️ O que fazer em {trip.destination}
+            </h2>
+
+            <div className={styles.placeTypeTabs}>
+              {PLACE_TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  className={`${styles.placeTypeBtn} ${placeType === t.value ? styles.placeTypeBtnActive : ''}`}
+                  onClick={() => setPlaceType(t.value)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {source === 'mock' && (
+              <p className={styles.mockNotice}>
+                Dados de exemplo — conecte o backend com Google Places para resultados reais.
+              </p>
+            )}
+
+            {placesLoading ? (
+              <Spinner center />
+            ) : (
+              <div className={styles.placesList}>
+                {places.map((place) => (
+                  <PlaceCard key={place.id} place={place} isMock={source === 'mock'} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {trip.notes && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>📝 Observações</h2>
+              <p className={styles.notes}>{trip.notes}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar — info da viagem */}
+        <div>
+          <div className={styles.infoCard}>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Status</span>
+              <Badge status={trip.status} />
+            </div>
+            {trip.startDate && (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Início</span>
+                <span className={styles.infoValue}>{formatDate(trip.startDate)}</span>
+              </div>
+            )}
+            {trip.endDate && (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Retorno</span>
+                <span className={styles.infoValue}>{formatDate(trip.endDate)}</span>
+              </div>
+            )}
+            {days !== null && (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Duração</span>
+                <span className={styles.infoValue}>{days} dias</span>
+              </div>
+            )}
+            {trip.budget && (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Orçamento</span>
+                <span className={styles.infoValue}>
+                  {formatCurrency(trip.budget, trip.currency ?? 'BRL')}
+                </span>
+              </div>
+            )}
+
+            <Button
+              as={Link}
+              to={ROUTES.ITINERARY.replace(':id', trip.id)}
+              variant="secondary"
+              fullWidth
+            >
+              📅 Ver roteiro
+            </Button>
+            <Button
+              as={Link}
+              to={ROUTES.MAP.replace(':id', trip.id)}
+              variant="secondary"
+              fullWidth
+            >
+              🗺️ Ver no mapa
+            </Button>
+          </div>
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
