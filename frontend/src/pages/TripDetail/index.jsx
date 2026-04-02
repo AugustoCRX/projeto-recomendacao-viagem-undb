@@ -3,6 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { PageLayout } from '@/components/layout';
 import { Button, Badge, Spinner } from '@/components/ui';
 import { PlaceCard } from '@/features/places/components/PlaceCard';
+import { CountryInfo } from '@/features/country/components/CountryInfo';
+import { WeatherWidget } from '@/features/weather/components/WeatherWidget';
+import { WeatherForecast } from '@/features/weather/components/WeatherForecast';
+import { useWeather } from '@/features/weather/hooks/useWeather';
 import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
 import { useDestinationPhoto } from '@/features/trips/hooks/useDestinationPhoto';
 import { usePlaces } from '@/features/places/hooks/usePlaces';
@@ -22,6 +26,7 @@ export default function TripDetailPage() {
   const { photo, fallback } = useDestinationPhoto(trip?.destination);
   const [placeType, setPlaceType] = useState('tourist_attraction');
   const { places, loading: placesLoading, source } = usePlaces(trip?.destination, placeType);
+  const weather = useWeather(trip?.destination);
 
   if (loading) return <PageLayout><Spinner center /></PageLayout>;
 
@@ -47,6 +52,9 @@ export default function TripDetailPage() {
       ? daysBetween(trip.startDate, trip.endDate)
       : null;
 
+  // Usa o país da viagem como fonte principal; cai no destino como fallback
+  const countryQuery = trip.country || trip.destination;
+
   return (
     <PageLayout>
       <div className={styles.backBtn}>
@@ -68,8 +76,28 @@ export default function TripDetailPage() {
       </div>
 
       <div className={styles.layout}>
-        {/* Coluna principal — lugares */}
+        {/* Coluna principal */}
         <div>
+          {/* Previsão do tempo */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>☁️ Previsão do tempo</h2>
+            <WeatherForecast
+              forecast={weather.forecast}
+              loading={weather.loading}
+              noKey={weather.noKey}
+              error={weather.error}
+            />
+          </div>
+
+          {/* Dados do país */}
+          {countryQuery && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>🌍 Sobre o país</h2>
+              <CountryInfo countryName={countryQuery} />
+            </div>
+          )}
+
+          {/* Lugares */}
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
               🗺️ O que fazer em {trip.destination}
@@ -114,6 +142,13 @@ export default function TripDetailPage() {
 
         {/* Sidebar — info da viagem */}
         <div>
+          <WeatherWidget
+            current={weather.current}
+            loading={weather.loading}
+            noKey={weather.noKey}
+            error={weather.error}
+          />
+
           <div className={styles.infoCard}>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Status</span>

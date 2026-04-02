@@ -1,5 +1,5 @@
 import { Input, Select, Textarea, Button, Spinner } from '@/components/ui';
-import { SUPPORTED_CURRENCIES, TRIP_STATUS } from '@/constants';
+import { TRIP_STATUS } from '@/constants';
 import { useDestinationPhoto } from '../hooks/useDestinationPhoto';
 import styles from './TripForm.module.css';
 
@@ -70,7 +70,7 @@ export function TripForm({ form, errors, submitting, setField, onSubmit, onCance
       />
 
       <Input
-        label="Orçamento"
+        label="Orçamento (R$)"
         type="number"
         min="0"
         placeholder="Ex: 5000"
@@ -78,16 +78,6 @@ export function TripForm({ form, errors, submitting, setField, onSubmit, onCance
         onChange={(e) => setField('budget', e.target.value)}
         error={errors.budget}
       />
-
-      <Select
-        label="Moeda"
-        value={form.currency}
-        onChange={(e) => setField('currency', e.target.value)}
-      >
-        {SUPPORTED_CURRENCIES.map((c) => (
-          <option key={c} value={c}>{c}</option>
-        ))}
-      </Select>
 
       <Select
         label="Status"

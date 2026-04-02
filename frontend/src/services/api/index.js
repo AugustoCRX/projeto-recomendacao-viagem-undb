@@ -4,10 +4,6 @@
 
 import { API_BASE_URL } from '../../constants';
 
-const defaultHeaders = {
-  'Content-Type': 'application/json',
-};
-
 async function request(baseURL, path, options = {}) {
   const { method = 'GET', headers = {}, body, params } = options;
 
@@ -20,9 +16,11 @@ async function request(baseURL, path, options = {}) {
     url = `${url}?${query}`;
   }
 
+  const baseHeaders = body ? { 'Content-Type': 'application/json' } : {};
+
   const response = await fetch(url, {
     method,
-    headers: { ...defaultHeaders, ...headers },
+    headers: { ...baseHeaders, ...headers },
     body: body ? JSON.stringify(body) : undefined,
   });
 
