@@ -32,5 +32,13 @@ export function useItinerary(trip) {
     [trip?.id],
   );
 
-  return { days, loading, addActivity, removeActivity };
+  const updateActivity = useCallback(
+    async (dayId, activityId, updates) => {
+      const updated = await itineraryCache.updateActivity(trip.id, dayId, activityId, updates);
+      setDays(updated);
+    },
+    [trip?.id],
+  );
+
+  return { days, loading, addActivity, removeActivity, updateActivity };
 }

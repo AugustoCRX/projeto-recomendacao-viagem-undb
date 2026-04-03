@@ -4,23 +4,19 @@ import { Button, Spinner } from '@/components/ui';
 import { DayColumn } from '@/features/itinerary/components/DayColumn';
 import { useItinerary } from '@/features/itinerary/hooks/useItinerary';
 import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
-import { placesCache } from '@/features/places/services/placesCache';
+import { usePlacesByDestination } from '@/features/places/hooks/usePlacesByDestination';
 import { ROUTES } from '@/constants';
 import { daysBetween } from '@/utils';
-import { useState, useEffect } from 'react';
 import styles from './Itinerary.module.css';
 
 export default function ItineraryPage() {
   const { id } = useParams();
   const { trip, loading: tripLoading } = useTripDetail(id);
-  const { days, loading: itineraryLoading, addActivity, removeActivity } = useItinerary(trip);
-  const [suggestions, setSuggestions] = useState([]);
+  const { days, loading: itineraryLoading, addActivity, removeActivity, updateActivity } = useItinerary(trip);
+  const { placesByType } = usePlacesByDestination(trip?.destination);
 
-  // Carrega sugestões de lugares do destino para o form de atividades
-  useEffect(() => {
-    if (!trip?.destination) return;
-    placesCache.getAll().then(setSuggestions);
-  }, [trip?.destination]);
+  // Achata todos os tipos em uma lista única para as sugestões rápidas
+  const suggestions = Object.values(placesByType).flat();
 
   if (tripLoading || itineraryLoading) {
     return <PageLayout><Spinner center /></PageLayout>;
@@ -82,6 +78,7 @@ export default function ItineraryPage() {
                   day={day}
                   onAddActivity={addActivity}
                   onRemoveActivity={removeActivity}
+                  onUpdateActivity={updateActivity}
                   suggestions={suggestions}
                 />
               ))}

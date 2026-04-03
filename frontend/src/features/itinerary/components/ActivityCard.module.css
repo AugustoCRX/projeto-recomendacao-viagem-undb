@@ -13,8 +13,15 @@
   box-shadow: var(--shadow-sm);
 }
 
-.card:hover .deleteBtn {
+.card:hover .deleteBtn,
+.card:hover .editBtn {
   opacity: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
 }
 
 .typeIcon {
@@ -54,18 +61,23 @@
   line-height: 1.4;
 }
 
+.editBtn,
 .deleteBtn {
   background: none;
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: 2px;
+  padding: 2px 4px;
   border-radius: var(--radius-sm);
   opacity: 0;
   transition: opacity var(--transition-fast), color var(--transition-fast);
   line-height: 1;
-  font-size: 1rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
+}
+
+.editBtn:hover {
+  color: var(--color-primary);
 }
 
 .deleteBtn:hover {

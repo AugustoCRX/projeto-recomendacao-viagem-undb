@@ -1,7 +1,7 @@
 import { ACTIVITY_TYPES } from '../constants';
 import styles from './ActivityCard.module.css';
 
-export function ActivityCard({ activity, dayId, onRemove }) {
+export function ActivityCard({ activity, dayId, onRemove, onEdit }) {
   const type = ACTIVITY_TYPES[activity.type] ?? ACTIVITY_TYPES.free;
 
   return (
@@ -16,13 +16,22 @@ export function ActivityCard({ activity, dayId, onRemove }) {
         {activity.notes && <p className={styles.notes}>{activity.notes}</p>}
       </div>
 
-      <button
-        className={styles.deleteBtn}
-        onClick={() => onRemove(dayId, activity.id)}
-        title="Remover atividade"
-      >
-        ×
-      </button>
+      <div className={styles.actions}>
+        <button
+          className={styles.editBtn}
+          onClick={() => onEdit(activity)}
+          title="Editar atividade"
+        >
+          ✏️
+        </button>
+        <button
+          className={styles.deleteBtn}
+          onClick={() => onRemove(dayId, activity.id)}
+          title="Remover atividade"
+        >
+          ×
+        </button>
+      </div>
     </div>
   );
 }

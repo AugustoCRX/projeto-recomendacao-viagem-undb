@@ -4,8 +4,8 @@ import styles from './ActivityForm.module.css';
 
 const EMPTY = { time: '', type: 'attraction', title: '', notes: '' };
 
-export function ActivityForm({ onSave, onCancel, suggestions = [] }) {
-  const [form, setForm] = useState(EMPTY);
+export function ActivityForm({ onSave, onCancel, suggestions = [], initialValues = null }) {
+  const [form, setForm] = useState(initialValues ?? EMPTY);
 
   const set = (field, value) => setForm((f) => ({ ...f, [field]: value }));
 

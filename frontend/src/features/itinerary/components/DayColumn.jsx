@@ -25,14 +25,25 @@ function isToday(dateStr) {
   );
 }
 
-export function DayColumn({ day, onAddActivity, onRemoveActivity, suggestions }) {
+export function DayColumn({ day, onAddActivity, onRemoveActivity, onUpdateActivity, suggestions }) {
   const [showForm, setShowForm] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
   const { weekday, date } = formatHeader(day.date);
   const todayClass = isToday(day.date) ? styles.today : '';
 
   const handleSave = async (activity) => {
     await onAddActivity(day.id, activity);
     setShowForm(false);
+  };
+
+  const handleEdit = (activity) => {
+    setShowForm(false);
+    setEditingActivity(activity);
+  };
+
+  const handleEditSave = async (updated) => {
+    await onUpdateActivity(day.id, editingActivity.id, updated);
+    setEditingActivity(null);
   };
 
   return (
@@ -47,14 +58,26 @@ export function DayColumn({ day, onAddActivity, onRemoveActivity, suggestions })
         {day.activities.length === 0 && !showForm && (
           <p className={styles.empty}>Nenhuma atividade</p>
         )}
-        {day.activities.map((activity) => (
-          <ActivityCard
-            key={activity.id}
-            activity={activity}
-            dayId={day.id}
-            onRemove={onRemoveActivity}
-          />
-        ))}
+        {day.activities.map((activity) =>
+          editingActivity?.id === activity.id ? (
+            <div key={activity.id} className={styles.formWrapper}>
+              <ActivityForm
+                initialValues={editingActivity}
+                onSave={handleEditSave}
+                onCancel={() => setEditingActivity(null)}
+                suggestions={suggestions}
+              />
+            </div>
+          ) : (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              dayId={day.id}
+              onRemove={onRemoveActivity}
+              onEdit={handleEdit}
+            />
+          )
+        )}
       </div>
 
       {showForm ? (
@@ -67,7 +90,7 @@ export function DayColumn({ day, onAddActivity, onRemoveActivity, suggestions })
         </div>
       ) : (
         <div className={styles.footer}>
-          <button className={styles.addBtn} onClick={() => setShowForm(true)}>
+          <button className={styles.addBtn} onClick={() => { setEditingActivity(null); setShowForm(true); }}>
             + Adicionar atividade
           </button>
         </div>

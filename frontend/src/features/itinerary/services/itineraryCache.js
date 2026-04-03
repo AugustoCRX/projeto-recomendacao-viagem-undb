@@ -65,4 +65,16 @@ export const itineraryCache = {
     }
     return Promise.resolve(days);
   },
+
+  updateActivity(tripId, dayId, activityId, updates) {
+    const days = load(tripId) ?? [];
+    const day = days.find((d) => d.id === dayId);
+    if (!day) return Promise.reject(new Error('Dia não encontrado'));
+    const idx = day.activities.findIndex((a) => a.id === activityId);
+    if (idx === -1) return Promise.reject(new Error('Atividade não encontrada'));
+    day.activities[idx] = { ...day.activities[idx], ...updates };
+    day.activities.sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''));
+    save(tripId, days);
+    return Promise.resolve(days);
+  },
 };
