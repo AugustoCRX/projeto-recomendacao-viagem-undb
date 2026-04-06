@@ -22,6 +22,24 @@ function getFallbackGradient(seed) {
   return FALLBACK_GRADIENTS[index];
 }
 
+// Tenta queries em ordem; retorna a melhor foto (maior likes) da primeira que retornar resultados
+async function findBestPhoto(destination) {
+  const queries = [
+    `${destination} landmark famous`,
+    `${destination} cityscape`,
+    `${destination}`,
+  ];
+  for (const query of queries) {
+    const data = await searchPhotos(query);
+    const results = data.results ?? [];
+    if (results.length) {
+      const best = results.reduce((a, b) => (b.likes > a.likes ? b : a));
+      return { type: 'image', value: best.urls.regular, alt: best.alt_description };
+    }
+  }
+  return null;
+}
+
 const HAS_UNSPLASH_KEY = Boolean(import.meta.env.VITE_UNSPLASH_ACCESS_KEY);
 
 export function useDestinationPhoto(destination) {
@@ -40,20 +58,20 @@ export function useDestinationPhoto(destination) {
       return;
     }
 
+    let active = true;
     setLoading(true);
-    searchPhotos(`${debouncedDestination} travel`, 1)
-      .then((data) => {
-        const result = data.results?.[0];
-        if (result) {
-          setPhoto({ type: 'image', value: result.urls.regular, alt: result.alt_description });
-        } else {
-          setPhoto({ type: 'gradient', value: getFallbackGradient(debouncedDestination) });
-        }
+
+    findBestPhoto(debouncedDestination)
+      .then((result) => {
+        if (!active) return;
+        setPhoto(result ?? { type: 'gradient', value: getFallbackGradient(debouncedDestination) });
       })
       .catch(() => {
-        setPhoto({ type: 'gradient', value: getFallbackGradient(debouncedDestination) });
+        if (active) setPhoto({ type: 'gradient', value: getFallbackGradient(debouncedDestination) });
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (active) setLoading(false); });
+
+    return () => { active = false; };
   }, [debouncedDestination]);
 
   return { photo, loading, fallback: getFallbackGradient(destination) };

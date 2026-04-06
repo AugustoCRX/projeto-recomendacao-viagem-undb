@@ -30,24 +30,20 @@
   margin-bottom: var(--space-2);
 }
 
-.description {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--font-size-xs);
-  color: var(--color-warning);
-  font-weight: 500;
-  margin-top: var(--space-2);
-}
-
-.mockBadge {
+.meta {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  font-style: italic;
+  margin-top: 2px;
+}
+
+.website {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  text-decoration: none;
+  margin-top: var(--space-1);
+}
+
+.website:hover {
+  text-decoration: underline;
 }

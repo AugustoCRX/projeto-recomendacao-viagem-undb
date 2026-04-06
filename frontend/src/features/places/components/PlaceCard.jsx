@@ -6,10 +6,9 @@ const TYPE_ICON = {
   lodging: '🏨',
   park: '🌳',
   museum: '🖼️',
-  shopping_mall: '🛍️',
 };
 
-export function PlaceCard({ place, isMock = false }) {
+export function PlaceCard({ place }) {
   const icon = TYPE_ICON[place.type] ?? '📍';
 
   return (
@@ -17,12 +16,18 @@ export function PlaceCard({ place, isMock = false }) {
       <span className={styles.icon}>{icon}</span>
       <div className={styles.content}>
         <p className={styles.name}>{place.name}</p>
-        {place.address && <p className={styles.address}>{place.address}</p>}
-        {place.description && <p className={styles.description}>{place.description}</p>}
-        <div className={styles.rating}>
-          ★ {place.rating?.toFixed(1) ?? '—'}
-          {isMock && <span className={styles.mockBadge}>(dados de exemplo)</span>}
-        </div>
+        {place.address && <p className={styles.address}>📍 {place.address}</p>}
+        {place.openingHours && <p className={styles.meta}>🕐 {place.openingHours}</p>}
+        {place.website && (
+          <a
+            href={place.website}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.website}
+          >
+            🔗 Site oficial
+          </a>
+        )}
       </div>
     </div>
   );
