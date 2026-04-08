@@ -9,25 +9,40 @@
   width: 100%;
   max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-8) var(--content-padding);
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: var(--space-6) var(--space-4);
+  }
 }
 
 .pageHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: var(--space-8);
   gap: var(--space-4);
 }
 
+.pageHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 .pageTitle {
   font-size: var(--font-size-2xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+  line-height: var(--line-height-tight);
 }
 
 .pageSubtitle {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-  margin-top: var(--space-1);
+  font-weight: var(--font-weight-normal);
+  margin-top: 2px;
 }

@@ -11,15 +11,19 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
   color: var(--color-text-primary);
   background-color: var(--color-bg);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -36,12 +40,14 @@ svg {
 button {
   cursor: pointer;
   font-family: inherit;
+  font-size: inherit;
 }
 
 input,
 textarea,
 select {
   font-family: inherit;
+  font-size: inherit;
 }
 
 ul,
@@ -50,6 +56,37 @@ ol {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  line-height: 1.25;
-  font-weight: 600;
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Global scrollbar ────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ── Focus visible ───────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Selection ───────────────────────────────────────── */
+::selection {
+  background: var(--color-primary-mid);
+  color: var(--color-primary-hover);
 }

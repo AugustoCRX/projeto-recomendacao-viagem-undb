@@ -1,62 +1,120 @@
 :root {
-  /* Colors */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-secondary: #0ea5e9;
-  --color-accent: #f97316;
+  /* ── Brand Colors ─────────────────────────────────────── */
+  --color-primary:        #2563eb;
+  --color-primary-hover:  #1d4ed8;
+  --color-primary-light:  #eff6ff;
+  --color-primary-mid:    #bfdbfe;
 
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f1f5f9;
-  --color-border: #e2e8f0;
+  --color-secondary:      #0ea5e9;
+  --color-accent:         #f97316;
+  --color-accent-light:   #fff7ed;
 
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
+  /* ── Neutral Palette ─────────────────────────────────── */
+  --color-bg:             #f5f7fa;
+  --color-bg-subtle:      #eef2f7;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-surface-hover:  #f8faff;
+  --color-border:         #e4e9f2;
+  --color-border-strong:  #c9d4e8;
 
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
+  /* ── Text ────────────────────────────────────────────── */
+  --color-text-primary:   #0f172a;
+  --color-text-secondary: #3d4f6b;
+  --color-text-muted:     #8898b0;
+  --color-text-on-dark:   #ffffff;
 
-  /* Typography */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
+  /* ── Semantic ────────────────────────────────────────── */
+  --color-success:        #10b981;
+  --color-success-light:  #d1fae5;
+  --color-warning:        #f59e0b;
+  --color-warning-light:  #fef3c7;
+  --color-danger:         #ef4444;
+  --color-danger-light:   #fee2e2;
+  --color-info:           #3b82f6;
+  --color-info-light:     #dbeafe;
+
+  /* ── Gradients ───────────────────────────────────────── */
+  --gradient-brand:       linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+  --gradient-brand-soft:  linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  --gradient-sunset:      linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+  --gradient-ocean:       linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  --gradient-surface:     linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font-sans:            'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:            ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  --font-size-2xs:  0.6875rem;
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
   --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.25rem;
+  --font-size-2xl:  1.5rem;
+  --font-size-3xl:  1.875rem;
+  --font-size-4xl:  2.25rem;
 
-  /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+  --font-weight-extrabold:800;
 
-  /* Border radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --line-height-tight:  1.2;
+  --line-height-snug:   1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed:1.65;
+
+  /* ── Spacing (4px base) ──────────────────────────────── */
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-5:  1.25rem;   /* 20px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+
+  /* ── Border Radius ───────────────────────────────────── */
+  --radius-xs:   0.1875rem;
+  --radius-sm:   0.3125rem;
+  --radius-md:   0.5rem;
+  --radius-lg:   0.75rem;
+  --radius-xl:   1rem;
+  --radius-2xl:  1.25rem;
+  --radius-3xl:  1.5rem;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  /* ── Shadows ─────────────────────────────────────────── */
+  --shadow-xs:  0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm:  0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md:  0 4px 8px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg:  0 12px 24px -4px rgba(15, 23, 42, 0.10), 0 4px 8px -2px rgba(15, 23, 42, 0.06);
+  --shadow-xl:  0 24px 48px -8px rgba(15, 23, 42, 0.14), 0 8px 16px -4px rgba(15, 23, 42, 0.08);
+  --shadow-primary: 0 4px 14px rgba(37, 99, 235, 0.30);
+  --shadow-card: 0 2px 8px rgba(15, 23, 42, 0.06), 0 0 1px rgba(15, 23, 42, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(15, 23, 42, 0.10), 0 0 1px rgba(15, 23, 42, 0.06);
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 300ms ease;
+  /* ── Transitions ─────────────────────────────────────── */
+  --transition-fast:   120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   320ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Layout */
-  --sidebar-width: 260px;
-  --header-height: 64px;
-  --max-content-width: 1280px;
+  /* ── Layout ──────────────────────────────────────────── */
+  --header-height:       68px;
+  --sidebar-width:       300px;
+  --max-content-width:   1280px;
+  --content-padding:     1.5rem;
+
+  /* ── Z-Index Scale ───────────────────────────────────── */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
 }

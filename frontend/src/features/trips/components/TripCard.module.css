@@ -1,10 +1,13 @@
 .card {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base),
+    border-color var(--transition-base);
   cursor: pointer;
   text-decoration: none;
   color: inherit;
@@ -13,22 +16,30 @@
 }
 
 .card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-3px);
+  border-color: var(--color-border-strong);
 }
 
+/* ── Cover image ─────────────────────────────────────── */
 .cover {
-  height: 160px;
+  height: 180px;
   background-size: cover;
   background-position: center;
   position: relative;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .coverOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%);
+  background: linear-gradient(
+    to top,
+    rgba(10, 18, 40, 0.65) 0%,
+    rgba(10, 18, 40, 0.15) 50%,
+    transparent 100%
+  );
 }
 
 .badgePosition {
@@ -37,8 +48,9 @@
   right: var(--space-3);
 }
 
+/* ── Body ────────────────────────────────────────────── */
 .body {
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -47,9 +59,10 @@
 
 .name {
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  line-height: 1.3;
+  line-height: var(--line-height-snug);
+  letter-spacing: -0.02em;
 }
 
 .destination {
@@ -57,9 +70,10 @@
   align-items: center;
   gap: var(--space-1);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
 }
 
+/* ── Meta row ────────────────────────────────────────── */
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -77,9 +91,11 @@
   color: var(--color-text-muted);
 }
 
+/* ── Actions footer ──────────────────────────────────── */
 .actions {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-5);
   border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
 }

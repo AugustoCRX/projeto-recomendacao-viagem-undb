@@ -1,20 +1,27 @@
+/* ── Hero ─────────────────────────────────────────────── */
 .hero {
-  height: 280px;
-  border-radius: var(--radius-xl);
+  height: 300px;
+  border-radius: var(--radius-2xl);
   background-size: cover;
   background-position: center;
   position: relative;
   overflow: hidden;
   margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-lg);
 }
 
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 55%);
+  background: linear-gradient(
+    to top,
+    rgba(10, 18, 40, 0.72) 0%,
+    rgba(10, 18, 40, 0.25) 50%,
+    transparent 100%
+  );
   display: flex;
   align-items: flex-end;
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-8);
 }
 
 .heroContent {
@@ -23,79 +30,117 @@
 
 .heroTitle {
   font-size: var(--font-size-3xl);
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .heroSubtitle {
   font-size: var(--font-size-base);
-  opacity: 0.85;
+  opacity: 0.80;
   margin-top: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
+/* ── Main layout ─────────────────────────────────────── */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 340px;
   gap: var(--space-8);
   align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
   }
 }
 
+/* ── Sections ────────────────────────────────────────── */
 .section {
   margin-bottom: var(--space-8);
 }
 
 .sectionTitle {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
   margin-bottom: var(--space-4);
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+/* ── Info Card ───────────────────────────────────────── */
 .infoCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+}
+
+.infoCard > a,
+.infoCard > button {
+  margin: 0 var(--space-4) var(--space-3);
+}
+
+.infoCard > a:first-of-type,
+.infoCard > button:first-of-type {
   margin-top: var(--space-4);
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   font-size: var(--font-size-sm);
   gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.infoRow:last-child {
+  border-bottom: none;
 }
 
 .infoLabel {
   color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
 }
 
 .infoValue {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   text-align: right;
 }
 
+/* ── Notes ───────────────────────────────────────────── */
 .notes {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
   white-space: pre-wrap;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
 }
 
+/* ── Places ──────────────────────────────────────────── */
 .placesList {
   display: flex;
   flex-direction: column;
@@ -113,18 +158,26 @@
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
-  font-weight: 500;
-  border: 1px solid var(--color-border);
+  font-weight: var(--font-weight-medium);
+  border: 1.5px solid var(--color-border);
   background: var(--color-surface);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
+  letter-spacing: -0.01em;
 }
 
-.placeTypeBtn:hover,
+.placeTypeBtn:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary-mid);
+}
+
 .placeTypeBtnActive {
   background: var(--color-primary);
   color: #fff;
   border-color: var(--color-primary);
+  box-shadow: var(--shadow-primary);
 }
 
 .mockNotice {
@@ -134,6 +187,7 @@
   font-style: italic;
 }
 
+/* ── Back button ─────────────────────────────────────── */
 .backBtn {
   margin-bottom: var(--space-6);
 }

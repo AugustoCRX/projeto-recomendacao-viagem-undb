@@ -50,7 +50,7 @@ export default function ItineraryPage() {
 
       {!trip.startDate || !trip.endDate ? (
         <div className={styles.noDates}>
-          <span className={styles.noDatesIcon}>📅</span>
+          <div className={styles.noDatesIllustration}>📅</div>
           <p className={styles.noDatesTitle}>Datas não definidas</p>
           <p className={styles.noDatesSubtitle}>
             Defina as datas da viagem para criar o roteiro por dias.

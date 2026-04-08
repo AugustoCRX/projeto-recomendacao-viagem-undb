@@ -8,8 +8,11 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <NavLink to={ROUTES.HOME} className={styles.logo}>
-          <span className={styles.logoIcon}>✈️</span>
-          Planejador de Viagens
+          <div className={styles.logoMark}>✈</div>
+          <div className={styles.logoText}>
+            <span className={styles.logoTitle}>Planejador</span>
+            <span className={styles.logoSub}>de Viagens</span>
+          </div>
         </NavLink>
 
         <nav className={styles.nav}>

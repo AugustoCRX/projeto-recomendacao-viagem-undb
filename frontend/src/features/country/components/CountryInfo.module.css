@@ -3,6 +3,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ── Header ─────────────────────────────────── */
@@ -11,7 +12,7 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-5) var(--space-6);
-  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  background: var(--gradient-brand-soft);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -33,9 +34,10 @@
 
 .countryName {
   font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
 }
 
 .meta {
@@ -48,12 +50,13 @@
 .regionPill {
   display: inline-flex;
   align-items: center;
-  padding: 2px var(--space-2);
-  background: #dbeafe;
+  padding: 3px var(--space-2);
+  background: var(--color-info-light);
   color: #1e40af;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid var(--color-primary-mid);
 }
 
 .officialName {
@@ -66,24 +69,21 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-5) var(--space-6);
-  background: #f8fafc;
+  gap: 1px;
+  background: var(--color-border);
 }
 
 .stat {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  transition: box-shadow var(--transition-fast);
+  transition: background-color var(--transition-fast);
 }
 
 .stat:hover {
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface-hover);
 }
 
 .statIcon {
@@ -94,21 +94,25 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  background: #eff6ff;
+  background: var(--gradient-brand-soft);
+  border: 1px solid var(--color-primary-mid);
   flex-shrink: 0;
 }
 
 .statLabel {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .statValue {
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  line-height: 1.3;
+  line-height: var(--line-height-snug);
+  letter-spacing: -0.01em;
 }
 
 .statSub {
@@ -117,7 +121,7 @@
   margin-top: -2px;
 }
 
-.drivingRight { color: #2563eb; }
+.drivingRight { color: var(--color-info); }
 .drivingLeft  { color: #7c3aed; }
 
 /* ── Skeleton ────────────────────────────────── */
@@ -133,7 +137,7 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-5) var(--space-6);
-  background: #eff6ff;
+  background: var(--gradient-brand-soft);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -156,7 +160,7 @@
   grid-template-columns: repeat(3, 1fr);
   padding: var(--space-5) var(--space-6);
   gap: var(--space-3);
-  background: #f8fafc;
+  background: var(--color-bg-subtle);
 }
 
 .skeletonStat {
@@ -172,12 +176,12 @@
 .bone {
   background: linear-gradient(
     90deg,
-    #f1f5f9 25%,
-    #e2e8f0 50%,
-    #f1f5f9 75%
+    var(--color-bg-subtle) 25%,
+    var(--color-border) 50%,
+    var(--color-bg-subtle) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
+  animation: shimmer 1.5s infinite;
   border-radius: var(--radius-sm);
 }
 

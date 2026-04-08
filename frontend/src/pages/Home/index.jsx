@@ -54,7 +54,7 @@ export default function HomePage() {
           <div className={styles.grid}>
             {filtered.length === 0 ? (
               <div className={styles.empty}>
-                <span className={styles.emptyIcon}>🗺️</span>
+                <div className={styles.emptyIllustration}>🗺️</div>
                 <p className={styles.emptyTitle}>
                   {activeFilter ? 'Nenhuma viagem nesta categoria' : 'Nenhuma viagem ainda'}
                 </p>
