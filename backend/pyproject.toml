@@ -1,8 +1,8 @@
 [project]
 requires-python = ">=3.9"
 name = "backend"
-version = "0.1.0"
-description = "travel planner app"
+version = "0.2.0"
+description = "Smart Travel Planner API"
 authors = [
     { name = "Augusto Cesar", email = "augusto.cesar.rodrigues@gmail.com" },
 ]
@@ -12,12 +12,16 @@ dependencies = [
     "pydantic>=2.0.0",
     "requests>=2.32.0",
     "loguru>=0.7.0",
-    "joblib>=1.2.0",
-    "scikit-learn>=1.1.3",
-    "pandas>=2.2.3",
     "httpx>=0.27.0",
     "sqlalchemy>=2.0.0",
-    "psycopg2-binary>=2.9.0"
+    "psycopg2-binary>=2.9.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "alembic>=1.13.0",
+    "markdown>=3.5.0",
+    "langgraph>=0.1.0",
+    "langchain-google-genai>=1.0.0",
+    "langchain-core>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -26,10 +30,8 @@ dev = [
     "black>=24.3",
     "autopep8>=2.0.0",
     "ipdb>=0.13.0",
-    "pylint>=3.0.0"
-]
-aws = [
-    "mangum>=0.17.0"
+    "pylint>=3.0.0",
+    "httpx>=0.27.0",
 ]
 
 [tool.black]
