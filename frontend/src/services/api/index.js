@@ -18,6 +18,9 @@ async function request(baseURL, path, options = {}) {
 
   const baseHeaders = body ? { 'Content-Type': 'application/json' } : {};
 
+  const token = localStorage.getItem('auth_token');
+  if (token) baseHeaders['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(url, {
     method,
     headers: { ...baseHeaders, ...headers },

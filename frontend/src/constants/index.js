@@ -18,6 +18,8 @@ export const ROUTES = {
   ITINERARY: '/trips/:id/itinerary',
   MAP: '/trips/:id/map',
   COMPARATOR: '/compare',
+  LOGIN: '/login',
+  REGISTER: '/register',
   NOT_FOUND: '*',
 };
 

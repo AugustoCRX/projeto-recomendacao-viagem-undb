@@ -1,9 +1,12 @@
 import { NavLink } from 'react-router-dom';
 import { ROUTES } from '@/constants';
+import { useAuth } from '@/features/auth/context/AuthContext';
 import { cn } from '@/utils';
 import styles from './Header.module.css';
 
 export function Header() {
+  const { isAuthenticated, user, logout } = useAuth();
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -16,22 +19,39 @@ export function Header() {
         </NavLink>
 
         <nav className={styles.nav}>
-          <NavLink
-            to={ROUTES.TRIPS}
-            className={({ isActive }) =>
-              cn(styles.navLink, isActive && styles.navLinkActive)
-            }
-          >
-            Minhas Viagens
-          </NavLink>
-          <NavLink
-            to={ROUTES.COMPARATOR}
-            className={({ isActive }) =>
-              cn(styles.navLink, isActive && styles.navLinkActive)
-            }
-          >
-            Comparar
-          </NavLink>
+          {isAuthenticated && (
+            <>
+              <NavLink
+                to={ROUTES.TRIPS}
+                className={({ isActive }) =>
+                  cn(styles.navLink, isActive && styles.navLinkActive)
+                }
+              >
+                Minhas Viagens
+              </NavLink>
+              <NavLink
+                to={ROUTES.COMPARATOR}
+                className={({ isActive }) =>
+                  cn(styles.navLink, isActive && styles.navLinkActive)
+                }
+              >
+                Comparar
+              </NavLink>
+            </>
+          )}
+
+          {isAuthenticated ? (
+            <div className={styles.userArea}>
+              <span className={styles.userName}>{user?.name}</span>
+              <button className={styles.logoutBtn} onClick={logout}>
+                Sair
+              </button>
+            </div>
+          ) : (
+            <NavLink to={ROUTES.LOGIN} className={styles.navLink}>
+              Entrar
+            </NavLink>
+          )}
         </nav>
       </div>
     </header>
