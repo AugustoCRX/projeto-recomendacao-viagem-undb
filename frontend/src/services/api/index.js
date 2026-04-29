@@ -29,7 +29,12 @@ async function request(baseURL, path, options = {}) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message ?? `Request failed: ${response.status}`);
+    if (response.status === 401) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      window.location.href = '/login';
+    }
+    throw new Error(error.detail ?? error.message ?? `Request failed: ${response.status}`);
   }
 
   return response.json();
