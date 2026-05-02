@@ -44,7 +44,7 @@
 .input:focus,
 .select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .titleInput {
@@ -125,12 +125,12 @@
   font-weight: var(--font-weight-semibold);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.28);
   transition: all var(--transition-fast);
 }
 
 .saveBtn:hover {
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.32);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.38);
 }
 
 .saveBtn:disabled {

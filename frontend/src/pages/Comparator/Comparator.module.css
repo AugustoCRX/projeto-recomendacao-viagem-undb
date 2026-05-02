@@ -1,0 +1,230 @@
+/* ── Selectors ────────────────────────────────────────────────────── */
+
+.selectors {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.selectorGroup {
+  flex: 1;
+}
+
+.vs {
+  flex-shrink: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  padding-bottom: var(--space-2);
+  align-self: flex-end;
+}
+
+/* ── Columns ─────────────────────────────────────────────────────── */
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.column {
+  background: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  border: 2px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.columnHighlight {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+/* ── Cover ───────────────────────────────────────────────────────── */
+
+.cover {
+  height: 168px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.08) 65%);
+}
+
+.coverContent {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-5);
+  right: var(--space-5);
+}
+
+.tripName {
+  color: var(--color-text-on-dark);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-1);
+  line-height: var(--line-height-tight);
+}
+
+.tripDestination {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.badgePos {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+.winnerBadge {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  background: var(--color-primary);
+  color: var(--color-text-on-dark);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+/* ── Sections ────────────────────────────────────────────────────── */
+
+.section {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 var(--space-2);
+}
+
+.sectionValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.sectionSub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-1);
+  line-height: var(--line-height-normal);
+}
+
+.sectionSub:last-child {
+  margin-bottom: 0;
+}
+
+.sectionMuted {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Weather ─────────────────────────────────────────────────────── */
+
+.weatherRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.weatherIcon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+/* ── Country ─────────────────────────────────────────────────────── */
+
+.countryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.flag {
+  height: 22px;
+  width: auto;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--space-2);
+  object-fit: cover;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+
+.empty {
+  text-align: center;
+  padding: var(--space-20) var(--space-8);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-2xl);
+}
+
+.emptyIcon {
+  font-size: 3.5rem;
+  margin: 0 0 var(--space-4);
+  line-height: 1;
+}
+
+.emptyTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.emptySubtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .selectors {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .vs {
+    align-self: center;
+    padding-bottom: 0;
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

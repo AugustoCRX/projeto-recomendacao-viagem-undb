@@ -130,7 +130,7 @@
 .placeItemSelected {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .placeIcon {

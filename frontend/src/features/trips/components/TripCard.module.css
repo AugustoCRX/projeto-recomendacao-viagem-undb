@@ -23,7 +23,7 @@
 
 /* ── Cover image ─────────────────────────────────────── */
 .cover {
-  height: 180px;
+  height: 200px;
   background-size: cover;
   background-position: center;
   position: relative;

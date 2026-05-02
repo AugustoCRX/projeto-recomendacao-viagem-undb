@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: var(--gradient-brand-soft);
+  background: var(--gradient-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,11 +10,12 @@
 .card {
   width: 100%;
   max-width: 400px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-2xl);
   padding: var(--space-8);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
 }
 
 .brand {

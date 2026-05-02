@@ -1,6 +1,6 @@
 .spinner {
   display: inline-block;
-  border: 2px solid rgba(37, 99, 235, 0.15);
+  border: 2px solid rgba(99, 102, 241, 0.15);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.65s cubic-bezier(0.4, 0, 0.2, 1) infinite;

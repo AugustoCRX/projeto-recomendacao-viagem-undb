@@ -1,12 +1,12 @@
 .card {
-  background: linear-gradient(145deg, #0f2460 0%, #1e40af 45%, #2563eb 100%);
+  background: linear-gradient(145deg, #1e1b4b 0%, #3730a3 45%, #6366f1 100%);
   border-radius: var(--radius-xl);
   padding: var(--space-5);
   color: #fff;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.30), 0 2px 8px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.32), 0 2px 8px rgba(15, 23, 42, 0.12);
   position: relative;
   overflow: hidden;
 }
@@ -119,7 +119,7 @@
 
 /* ── Skeleton ────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(145deg, #0f2460 0%, #1e40af 45%, #2563eb 100%);
+  background: linear-gradient(145deg, #1e1b4b 0%, #3730a3 45%, #6366f1 100%);
   border-radius: var(--radius-xl);
   padding: var(--space-5);
   display: flex;
