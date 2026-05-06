@@ -99,7 +99,7 @@ async def generate_plan_node(state: TravelPlanState) -> dict[str, Any]:
         return {"error": "GOOGLE_API_KEY not configured"}
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="GEMINI_MODEL",
         temperature=0.7,
         google_api_key=api_key,
     )

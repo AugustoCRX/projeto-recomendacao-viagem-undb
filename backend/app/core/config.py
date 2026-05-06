@@ -61,6 +61,7 @@ OPENWEATHER_API_KEY: Secret = config("OPENWEATHER_API_KEY", cast=Secret, default
 EXCHANGERATE_API_KEY: Secret = config("EXCHANGERATE_API_KEY", cast=Secret, default="")
 UNSPLASH_ACCESS_KEY: Secret = config("UNSPLASH_ACCESS_KEY", cast=Secret, default="")
 GOOGLE_API_KEY: Secret = config("GOOGLE_API_KEY", cast=Secret, default="")
+GEMINI_MODEL: str = config("GEMINI_MODEL", default="gemini-2.0-flash")
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
