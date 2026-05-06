@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getWeatherByCity, getForecastByCity } from '@/services/api/weather';
+import { getWeatherByCity, getForecastByCity, getWeatherViaProxy } from '@/services/api/weather';
 
-const HAS_KEY = Boolean(import.meta.env.VITE_OPENWEATHER_API_KEY);
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
+const HAS_KEY = USE_BACKEND || Boolean(import.meta.env.VITE_OPENWEATHER_API_KEY);
 
 function normalizeForecast(data) {
   const byDay = {};
@@ -49,19 +50,25 @@ export function useWeather(city) {
   useEffect(() => {
     if (!city || !HAS_KEY) return;
 
-    // Garante que atualizações de chamadas obsoletas (StrictMode, re-renders)
-    // não sobrescrevam o estado depois que o componente foi desmontado.
     let active = true;
-
     setLoading(true);
     setError(null);
 
-    Promise.all([getWeatherByCity(city), getForecastByCity(city)])
-      .then(([currentData, forecastData]) => {
-        if (!active) return;
-        setCurrent(normalizeCurrent(currentData));
-        setForecast(normalizeForecast(forecastData));
-      })
+    const fetch = USE_BACKEND
+      ? getWeatherViaProxy(city).then(({ current: c, forecast: f }) => {
+          if (!active) return;
+          setCurrent(normalizeCurrent(c));
+          setForecast(normalizeForecast(f));
+        })
+      : Promise.all([getWeatherByCity(city), getForecastByCity(city)]).then(
+          ([currentData, forecastData]) => {
+            if (!active) return;
+            setCurrent(normalizeCurrent(currentData));
+            setForecast(normalizeForecast(forecastData));
+          },
+        );
+
+    fetch
       .catch(() => {
         if (!active) return;
         setError('Não foi possível carregar o clima');

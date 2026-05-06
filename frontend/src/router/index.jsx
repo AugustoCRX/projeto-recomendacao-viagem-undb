@@ -8,6 +8,7 @@ import TripDetailPage from '@/pages/TripDetail';
 import ItineraryPage from '@/pages/Itinerary';
 import MapViewPage from '@/pages/MapView';
 import ComparatorPage from '@/pages/Comparator';
+import ProfilePage from '@/pages/Profile';
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
 import NotFoundPage from '@/pages/NotFound';
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
   { path: ROUTES.ITINERARY,   element: protect(<ItineraryPage />) },
   { path: ROUTES.MAP,         element: protect(<MapViewPage />) },
   { path: ROUTES.COMPARATOR,  element: protect(<ComparatorPage />) },
+  { path: ROUTES.PROFILE,     element: protect(<ProfilePage />) },
 
   { path: ROUTES.NOT_FOUND, element: <NotFoundPage /> },
 ]);

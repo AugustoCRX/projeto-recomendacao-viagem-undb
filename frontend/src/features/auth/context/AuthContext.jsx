@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authService } from '../services/auth';
 
 const TOKEN_KEY = 'auth_token';
@@ -30,22 +30,38 @@ export function AuthProvider({ children }) {
   const stored = loadFromStorage();
   const [token, setToken] = useState(stored.token);
   const [user, setUser] = useState(stored.user);
+  const [validating, setValidating] = useState(!!stored.token);
 
-  const _applySession = useCallback((access_token, userData) => {
-    saveToStorage(access_token, userData);
-    setToken(access_token);
+  useEffect(() => {
+    if (!stored.token) return;
+    authService.getMe()
+      .then((freshUser) => {
+        saveToStorage(stored.token, freshUser);
+        setUser(freshUser);
+      })
+      .catch(() => {
+        clearStorage();
+        setToken(null);
+        setUser(null);
+      })
+      .finally(() => setValidating(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const _applySession = useCallback((token, userData) => {
+    saveToStorage(token, userData);
+    setToken(token);
     setUser(userData);
   }, []);
 
   const login = useCallback(async (email, password) => {
     const data = await authService.login({ email, password });
-    _applySession(data.access_token, data.user);
+    _applySession(data.token, data.user);
     return data;
   }, [_applySession]);
 
   const register = useCallback(async (name, email, password) => {
     const data = await authService.register({ name, email, password });
-    _applySession(data.access_token, data.user);
+    _applySession(data.token, data.user);
     return data;
   }, [_applySession]);
 
@@ -59,10 +75,11 @@ export function AuthProvider({ children }) {
     user,
     token,
     isAuthenticated: !!token,
+    validating,
     login,
     register,
     logout,
-  }), [user, token, login, register, logout]);
+  }), [user, token, validating, login, register, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

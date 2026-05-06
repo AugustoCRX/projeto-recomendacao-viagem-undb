@@ -8,12 +8,14 @@ const TYPE_ICON = {
   museum: '🖼️',
 };
 
-export function PlaceCard({ place }) {
+export function PlaceCard({ place, onSave, onRemove, isSaved, isPending }) {
   const icon = TYPE_ICON[place.type] ?? '📍';
+  const showSaveAction = Boolean(onSave || onRemove);
 
   return (
     <div className={styles.card}>
       <span className={styles.icon}>{icon}</span>
+
       <div className={styles.content}>
         <p className={styles.name}>{place.name}</p>
         {place.address && <p className={styles.address}>📍 {place.address}</p>}
@@ -29,6 +31,17 @@ export function PlaceCard({ place }) {
           </a>
         )}
       </div>
+
+      {showSaveAction && (
+        <button
+          className={`${styles.saveBtn} ${isSaved ? styles.saveBtnSaved : ''}`}
+          onClick={isSaved ? onRemove : onSave}
+          disabled={isPending}
+          title={isSaved ? 'Remover dos lugares salvos' : 'Salvar lugar'}
+        >
+          {isPending ? '…' : isSaved ? '🔖' : '＋'}
+        </button>
+      )}
     </div>
   );
 }

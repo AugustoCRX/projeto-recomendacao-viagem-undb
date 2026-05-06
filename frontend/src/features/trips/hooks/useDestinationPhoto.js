@@ -1,9 +1,9 @@
-// Busca uma foto representativa do destino usando Unsplash.
-// Fallback: gradient baseado no nome do destino (sem chamar API).
-
 import { useState, useEffect } from 'react';
 import { useDebounce } from '@/hooks';
-import { searchPhotos } from '@/services/api/unsplash';
+import { searchPhotos, searchPhotosViaProxy } from '@/services/api/unsplash';
+
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
+const HAS_UNSPLASH_KEY = USE_BACKEND || Boolean(import.meta.env.VITE_UNSPLASH_ACCESS_KEY);
 
 const FALLBACK_GRADIENTS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -16,19 +16,27 @@ const FALLBACK_GRADIENTS = [
 
 function getFallbackGradient(seed) {
   const index = seed
-    ? seed.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) %
-      FALLBACK_GRADIENTS.length
+    ? seed.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % FALLBACK_GRADIENTS.length
     : 0;
   return FALLBACK_GRADIENTS[index];
 }
 
-// Tenta queries em ordem; retorna a melhor foto (maior likes) da primeira que retornar resultados
-async function findBestPhoto(destination) {
-  const queries = [
-    `${destination} landmark famous`,
-    `${destination} cityscape`,
-    `${destination}`,
-  ];
+// Backend proxy — results: [{ id, url, thumb, alt }]
+async function findBestPhotoViaProxy(destination) {
+  const queries = [`${destination} landmark famous`, `${destination} cityscape`, destination];
+  for (const query of queries) {
+    const data = await searchPhotosViaProxy(query, 5);
+    const results = data.results ?? [];
+    if (results.length) {
+      return { type: 'image', value: results[0].url, alt: results[0].alt };
+    }
+  }
+  return null;
+}
+
+// Direct Unsplash — results: [{ urls: { regular }, alt_description, likes }]
+async function findBestPhotoDirect(destination) {
+  const queries = [`${destination} landmark famous`, `${destination} cityscape`, destination];
   for (const query of queries) {
     const data = await searchPhotos(query);
     const results = data.results ?? [];
@@ -39,8 +47,6 @@ async function findBestPhoto(destination) {
   }
   return null;
 }
-
-const HAS_UNSPLASH_KEY = Boolean(import.meta.env.VITE_UNSPLASH_ACCESS_KEY);
 
 export function useDestinationPhoto(destination) {
   const debouncedDestination = useDebounce(destination, 600);
@@ -61,7 +67,11 @@ export function useDestinationPhoto(destination) {
     let active = true;
     setLoading(true);
 
-    findBestPhoto(debouncedDestination)
+    const find = USE_BACKEND
+      ? findBestPhotoViaProxy(debouncedDestination)
+      : findBestPhotoDirect(debouncedDestination);
+
+    find
       .then((result) => {
         if (!active) return;
         setPhoto(result ?? { type: 'gradient', value: getFallbackGradient(debouncedDestination) });

@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
-import { getCountryByName } from '@/services/api/countries';
+import { getCountryByName, getCountryViaProxy } from '@/services/api/countries';
 
-// Normaliza o shape bruto da REST Countries API para um objeto simples e tipado.
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
+
 function normalize(raw) {
   const currencies = Object.entries(raw.currencies ?? {});
   const mainCurrency = currencies[0];
-
   const languages = Object.values(raw.languages ?? {});
-
   const root = raw.idd?.root ?? '';
   const suffix = raw.idd?.suffixes?.[0] ?? '';
   const phonePrefix = root && suffix ? `${root}${suffix}` : null;
-
   const populationFormatted = new Intl.NumberFormat('pt-BR').format(raw.population ?? 0);
   const areaFormatted = new Intl.NumberFormat('pt-BR').format(Math.round(raw.area ?? 0));
 
@@ -51,12 +49,14 @@ export function useCountry(countryName) {
     setError(null);
     setCountry(null);
 
-    getCountryByName(countryName)
-      .then((data) => {
-        // A API retorna array — pegamos o primeiro resultado
-        const raw = Array.isArray(data) ? data[0] : data;
-        setCountry(normalize(raw));
-      })
+    const fetch = USE_BACKEND
+      ? getCountryViaProxy(countryName).then((data) => setCountry(normalize(data)))
+      : getCountryByName(countryName).then((data) => {
+          const raw = Array.isArray(data) ? data[0] : data;
+          setCountry(normalize(raw));
+        });
+
+    fetch
       .catch(() => setError('País não encontrado'))
       .finally(() => setLoading(false));
   }, [countryName]);

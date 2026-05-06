@@ -37,6 +37,10 @@ async function request(baseURL, path, options = {}) {
     throw new Error(error.detail ?? error.message ?? `Request failed: ${response.status}`);
   }
 
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
+    return null;
+  }
+
   return response.json();
 }
 

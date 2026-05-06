@@ -74,3 +74,50 @@
   color: var(--color-primary-hover);
   text-decoration: underline;
 }
+
+/* ── Save button ─────────────────────────────────────────── */
+.saveBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-mid);
+  color: var(--color-primary);
+  transform: scale(1.08);
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveBtnSaved {
+  background: var(--color-success-light);
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+
+.saveBtnSaved:hover:not(:disabled) {
+  background: var(--color-danger-light);
+  border-color: #fca5a5;
+  color: var(--color-danger);
+}

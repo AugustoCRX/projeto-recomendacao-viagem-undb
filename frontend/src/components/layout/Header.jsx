@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { cn } from '@/utils';
@@ -42,7 +42,9 @@ export function Header() {
 
           {isAuthenticated ? (
             <div className={styles.userArea}>
-              <span className={styles.userName}>{user?.name}</span>
+              <Link to={ROUTES.PROFILE} className={styles.userName}>
+                {user?.name}
+              </Link>
               <button className={styles.logoutBtn} onClick={logout}>
                 Sair
               </button>

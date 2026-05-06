@@ -5,6 +5,7 @@
 // Resposta esperada: { access_token: string, token_type: "bearer", user: { id, name, email } }
 
 import { API_BASE_URL } from '@/constants';
+import { backendClient } from '@/services/api';
 
 const AUTH_BASE = `${API_BASE_URL}/api/v1/auth`;
 const USE_MOCK = import.meta.env.VITE_MOCK_AUTH === 'true';
@@ -40,6 +41,19 @@ const mockService = {
     const user = { id: found.id, name: found.name, email: found.email };
     return { access_token: makeMockToken(user.id), token_type: 'bearer', user };
   },
+
+  async changePassword() {
+    throw new Error('Alterar senha não está disponível no modo demo.');
+  },
+
+  async getMe() {
+    await mockDelay();
+    try {
+      const user = JSON.parse(localStorage.getItem('auth_user'));
+      if (user) return user;
+    } catch {}
+    throw new Error('Sessão inválida.');
+  },
 };
 
 // ── Real HTTP service ─────────────────────────────────────────────────────────
@@ -62,6 +76,12 @@ async function authRequest(path, body) {
 const httpService = {
   register: (payload) => authRequest('/register', payload),
   login: (payload) => authRequest('/login', payload),
+  changePassword: ({ currentPassword, newPassword }) =>
+    backendClient.put('/api/v1/auth/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  getMe: () => backendClient.get('/api/v1/auth/me'),
 };
 
 // ── Export ────────────────────────────────────────────────────────────────────

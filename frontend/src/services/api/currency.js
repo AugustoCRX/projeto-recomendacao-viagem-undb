@@ -1,8 +1,5 @@
-import { request } from './index';
-import { EXCHANGERATE_BASE_URL } from '../../constants';
+import { backendClient } from './index';
 
-const API_KEY = import.meta.env.VITE_EXCHANGERATE_API_KEY;
-
-export function getExchangeRates(baseCurrency) {
-  return request(EXCHANGERATE_BASE_URL, `/${API_KEY}/latest/${baseCurrency}`);
+export function convertCurrency(from, to, amount) {
+  return backendClient.get('/api/v1/external/exchange', { from, to, amount });
 }

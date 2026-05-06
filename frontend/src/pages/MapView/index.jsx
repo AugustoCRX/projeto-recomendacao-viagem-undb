@@ -8,9 +8,12 @@ import { Button, Spinner } from '@/components/ui';
 import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
 import { useGeocode } from '@/features/map/hooks/useGeocode';
 import { useOverpassPlaces } from '@/features/map/hooks/useOverpassPlaces';
+import { useSavedPlaces } from '@/features/places/hooks/useSavedPlaces';
 import { ROUTES } from '@/constants';
 // Pontos de interesse vêm da Overpass API (OpenStreetMap), sem mock
 import styles from './MapView.module.css';
+
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -76,6 +79,7 @@ export default function MapViewPage() {
   const { trip, loading: tripLoading } = useTripDetail(id);
   const { coords, loading: geoLoading, error: geoError } = useGeocode(trip?.destination);
   const { places, loading: placesLoading, error: placesError } = useOverpassPlaces(coords);
+  const { isSaved, getSavedId, savePlace, removePlace, pending } = useSavedPlaces(trip?.id);
 
   const [activeTypes, setActiveTypes] = useState(new Set(TYPES));
   const [selected, setSelected] = useState(null);
@@ -158,6 +162,8 @@ export default function MapViewPage() {
 
           {allVisible.map((place) => {
             const cfg = TYPE_CONFIG[place.type];
+            const saved = USE_BACKEND && isSaved(place.id);
+            const isPending = USE_BACKEND && pending.has(place.id);
             return (
               <div
                 key={place.id}
@@ -176,6 +182,21 @@ export default function MapViewPage() {
                     <span className={styles.placeHours}>🕐 {place.openingHours}</span>
                   )}
                 </div>
+                {USE_BACKEND && (
+                  <button
+                    className={`${styles.saveBtn} ${saved ? styles.saveBtnSaved : ''}`}
+                    disabled={isPending}
+                    title={saved ? 'Remover dos lugares salvos' : 'Salvar lugar'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      saved
+                        ? removePlace(getSavedId(place.id))
+                        : savePlace({ name: place.name, address: place.address, lat: place.lat, lng: place.lng, category: place.type, placeId: place.id });
+                    }}
+                  >
+                    {isPending ? '…' : saved ? '🔖' : '＋'}
+                  </button>
+                )}
               </div>
             );
           })}

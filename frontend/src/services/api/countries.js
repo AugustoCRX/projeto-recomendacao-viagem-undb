@@ -1,22 +1,16 @@
-import { request } from './index';
+import { request, backendClient } from './index';
 import { REST_COUNTRIES_BASE_URL } from '../../constants';
 
-// Apenas os campos que usamos — reduz o payload de ~20KB para ~1KB por país
 const FIELDS = [
-  'name',
-  'capital',
-  'flags',
-  'population',
-  'languages',
-  'currencies',
-  'timezones',
-  'region',
-  'subregion',
-  'area',
-  'idd',
-  'car',
-  'tld',
+  'name', 'capital', 'flags', 'population', 'languages', 'currencies',
+  'timezones', 'region', 'subregion', 'area', 'idd', 'car', 'tld',
 ].join(',');
+
+// Backend proxy — returns a single object (backend already dedupes the array).
+// Cached 24h server-side.
+export function getCountryViaProxy(name) {
+  return backendClient.get('/api/v1/external/country', { name });
+}
 
 export function getCountryByName(name) {
   return request(REST_COUNTRIES_BASE_URL, `/name/${encodeURIComponent(name)}`, {

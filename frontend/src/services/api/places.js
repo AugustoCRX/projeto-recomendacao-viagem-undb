@@ -5,5 +5,5 @@
 import { backendClient } from './index';
 
 export function getPlacesByDestination(destination, type = 'tourist_attraction') {
-  return backendClient.get('/api/v1/external/places', { destination, type });
+  return backendClient.get('/api/v1/external/places', { city: destination, type });
 }

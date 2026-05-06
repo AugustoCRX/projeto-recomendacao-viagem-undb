@@ -10,9 +10,14 @@ import { useWeather } from '@/features/weather/hooks/useWeather';
 import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
 import { useDestinationPhoto } from '@/features/trips/hooks/useDestinationPhoto';
 import { usePlacesByDestination } from '@/features/places/hooks/usePlacesByDestination';
+import { AiPlannerModal } from '@/features/ai/components/AiPlannerModal';
+import { useSavedPlaces } from '@/features/places/hooks/useSavedPlaces';
+import { CurrencyConverter } from '@/features/currency/components/CurrencyConverter';
 import { ROUTES } from '@/constants';
 import { formatDate, formatCurrency, daysBetween } from '@/utils';
 import styles from './TripDetail.module.css';
+
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
 
 const PLACE_TYPES = [
   { label: '🏛️ Atrações', value: 'tourist_attraction' },
@@ -25,6 +30,8 @@ export default function TripDetailPage() {
   const { trip, loading, error } = useTripDetail(id);
   const { photo, fallback } = useDestinationPhoto(trip?.destination);
   const [placeType, setPlaceType] = useState('tourist_attraction');
+  const [showAiPlanner, setShowAiPlanner] = useState(false);
+  const { savedPlaces, isSaved, getSavedId, savePlace, removePlace, pending } = useSavedPlaces(trip?.id);
   const { placesByType, loading: placesLoading } = usePlacesByDestination(trip?.destination);
   const places = placesByType[placeType] ?? [];
   const weather = useWeather(trip?.destination);
@@ -123,7 +130,14 @@ export default function TripDetailPage() {
             ) : (
               <div className={styles.placesList}>
                 {places.map((place) => (
-                  <PlaceCard key={place.id} place={place} />
+                  <PlaceCard
+                    key={place.id}
+                    place={place}
+                    isSaved={USE_BACKEND ? isSaved(place.id) : undefined}
+                    isPending={USE_BACKEND ? pending.has(place.id) : undefined}
+                    onSave={USE_BACKEND ? () => savePlace({ name: place.name, address: place.address, lat: place.lat, lng: place.lng, category: place.type, placeId: place.id }) : undefined}
+                    onRemove={USE_BACKEND ? () => removePlace(getSavedId(place.id)) : undefined}
+                  />
                 ))}
               </div>
             )}
@@ -133,6 +147,29 @@ export default function TripDetailPage() {
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>📝 Observações</h2>
               <p className={styles.notes}>{trip.notes}</p>
+            </div>
+          )}
+
+          {USE_BACKEND && savedPlaces.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>📌 Lugares salvos ({savedPlaces.length})</h2>
+              <div className={styles.placesList}>
+                {savedPlaces.map((saved) => (
+                  <PlaceCard
+                    key={saved.id}
+                    place={{
+                      id: saved.place_id ?? saved.id,
+                      name: saved.name,
+                      address: saved.address,
+                      lat: saved.lat ? Number(saved.lat) : null,
+                      lng: saved.lng ? Number(saved.lng) : null,
+                      type: saved.category,
+                    }}
+                    isSaved
+                    onRemove={() => removePlace(saved.id)}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -194,9 +231,22 @@ export default function TripDetailPage() {
             >
               🗺️ Ver no mapa
             </Button>
+            {USE_BACKEND && (
+              <Button fullWidth onClick={() => setShowAiPlanner(true)}>
+                ✨ Gerar roteiro com IA
+              </Button>
+            )}
           </div>
+
+          {USE_BACKEND && (
+            <CurrencyConverter initialFrom={trip.currency ?? 'BRL'} />
+          )}
         </div>
       </div>
+
+      {showAiPlanner && (
+        <AiPlannerModal trip={trip} onClose={() => setShowAiPlanner(false)} />
+      )}
     </PageLayout>
   );
 }
