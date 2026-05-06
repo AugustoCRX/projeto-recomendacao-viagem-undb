@@ -86,26 +86,166 @@ Constraints:
     return {"raw_plan": "", "structured_plan": [], "prompt": prompt}
 
 
+# (provider, model) that succeeded most recently — short-circuits the fallback loop.
+_LIVE_CHOICE: tuple[str, str] | None = None
+
+
+def _is_model_error(exc: Exception) -> bool:
+    """True if the exception looks like a model-name / availability problem
+    that *might* be solved by trying a different model."""
+    s = repr(exc).lower()
+    return any(
+        m in s
+        for m in (
+            "not_found",
+            "invalid_argument",
+            "unexpected model name",
+            "is not found for api version",
+            "is not supported",
+            "permission_denied",
+            # Per-model quota — different models have separate buckets in
+            # the Google AI Studio free tier, so it's worth trying the next.
+            "resource_exhausted",
+            "quota exceeded",
+            "429",
+        )
+    )
+
+
+def _is_quota_error(exc: Exception) -> bool:
+    """Specifically a 429 / RESOURCE_EXHAUSTED — used to surface a friendlier
+    client-facing error after all fallbacks are exhausted."""
+    s = repr(exc).lower()
+    return "resource_exhausted" in s or "429" in s or "quota exceeded" in s
+
+
+def _build_llm(provider: str, model: str):
+    """Factory: return a configured LangChain chat client for the provider."""
+    from core.config import (
+        GOOGLE_API_KEY,
+        GROQ_API_KEY,
+        OPENROUTER_API_KEY,
+    )
+
+    if provider == "gemini":
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        key = str(GOOGLE_API_KEY)
+        if not key:
+            return None
+        return ChatGoogleGenerativeAI(model=model, temperature=0.7, google_api_key=key)
+
+    if provider == "groq":
+        try:
+            from langchain_groq import ChatGroq
+        except ImportError:
+            logger.warning("langchain-groq not installed; skipping groq provider")
+            return None
+        key = str(GROQ_API_KEY)
+        if not key:
+            return None
+        return ChatGroq(model=model, temperature=0.7, api_key=key)
+
+    if provider == "openrouter":
+        # OpenRouter implements the OpenAI Chat Completions API.
+        try:
+            from langchain_openai import ChatOpenAI
+        except ImportError:
+            logger.warning("langchain-openai not installed; skipping openrouter provider")
+            return None
+        key = str(OPENROUTER_API_KEY)
+        if not key:
+            return None
+        return ChatOpenAI(
+            model=model,
+            temperature=0.7,
+            api_key=key,
+            base_url="https://openrouter.ai/api/v1",
+        )
+
+    logger.warning(f"Unknown AI provider: {provider!r}")
+    return None
+
+
+def _candidates() -> list[tuple[str, str]]:
+    """Build (provider, model) attempt list, deduped, with cached live choice first."""
+    from core.config import (
+        AI_PROVIDERS,
+        GEMINI_FALLBACKS,
+        GEMINI_MODEL,
+        GROQ_FALLBACKS,
+        GROQ_MODEL,
+        OPENROUTER_FALLBACKS,
+        OPENROUTER_MODEL,
+    )
+
+    per_provider: dict[str, list[str]] = {
+        "gemini":     [GEMINI_MODEL, *GEMINI_FALLBACKS],
+        "groq":       [GROQ_MODEL, *GROQ_FALLBACKS],
+        "openrouter": [OPENROUTER_MODEL, *OPENROUTER_FALLBACKS],
+    }
+    out: list[tuple[str, str]] = []
+    if _LIVE_CHOICE:
+        out.append(_LIVE_CHOICE)
+    for provider in AI_PROVIDERS:
+        provider = provider.strip().lower()
+        for model in per_provider.get(provider, []):
+            pair = (provider, model)
+            if pair not in out:
+                out.append(pair)
+    return out
+
+
 # ── 3. generate plan (LLM call) ───────────────────────────────────────────────
 async def generate_plan_node(state: TravelPlanState) -> dict[str, Any]:
-    # Lazy import so importing this module never requires the LLM dep.
     from langchain_core.messages import HumanMessage
-    from langchain_google_genai import ChatGoogleGenerativeAI
 
-    from core.config import GOOGLE_API_KEY, GEMINI_MODEL
-
-    api_key = str(GOOGLE_API_KEY)
-    if not api_key:
-        return {"error": "GOOGLE_API_KEY not configured"}
-
-    llm = ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        temperature=0.7,
-        google_api_key=api_key,
-    )
     prompt = state.get("prompt", "")  # type: ignore[arg-type]
-    response = await llm.ainvoke([HumanMessage(content=prompt)])
-    return {"raw_plan": response.content if hasattr(response, "content") else str(response)}
+    if not prompt:
+        return {"error": "prompt was empty before LLM call"}
+
+    global _LIVE_CHOICE
+    attempts = _candidates()
+    if not attempts:
+        return {"error": "no AI provider configured (set GROQ_API_KEY / OPENROUTER_API_KEY / GOOGLE_API_KEY)"}
+
+    last_err: Exception | None = None
+    tried: list[str] = []
+    for provider, model in attempts:
+        llm = _build_llm(provider, model)
+        if llm is None:
+            continue  # provider not configured — silently skip
+        tried.append(f"{provider}:{model}")
+        try:
+            response = await llm.ainvoke([HumanMessage(content=prompt)])
+        except Exception as exc:  # noqa: BLE001 — broad on purpose
+            last_err = exc
+            if _is_model_error(exc):
+                logger.warning(f"{provider}:{model} failed ({exc}); trying next.")
+                continue
+            return {"error": f"LLM call failed on {provider}:{model}: {exc}"}
+
+        # Success — cache the working pair.
+        _LIVE_CHOICE = (provider, model)
+        if len(tried) > 1:
+            logger.info(f"AI fallback active: settled on {provider}:{model} after {tried[:-1]}")
+        content = response.content if hasattr(response, "content") else str(response)
+        return {"raw_plan": content}
+
+    if last_err is not None and _is_quota_error(last_err):
+        return {
+            "error": "quota_exhausted",
+            "error_detail": (
+                f"Todos os providers de IA esgotaram quota / estão indisponíveis "
+                f"(tentados: {tried}). Tente novamente em alguns minutos ou "
+                f"configure outra GROQ_API_KEY / OPENROUTER_API_KEY no Render."
+            ),
+        }
+    return {
+        "error": (
+            f"All AI providers failed (tried {tried or 'none — no key configured'}). "
+            f"Last error: {last_err}"
+        )
+    }
 
 
 # ── 4. parse plan ─────────────────────────────────────────────────────────────
