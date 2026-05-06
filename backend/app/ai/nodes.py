@@ -83,7 +83,7 @@ Constraints:
 - 3 to 5 activities per day, ordered chronologically.
 - Times in 24h HH:mm.
 """
-    return {"raw_plan": "", "structured_plan": [], "_prompt": prompt}
+    return {"raw_plan": "", "structured_plan": [], "prompt": prompt}
 
 
 # ── 3. generate plan (LLM call) ───────────────────────────────────────────────
@@ -103,7 +103,7 @@ async def generate_plan_node(state: TravelPlanState) -> dict[str, Any]:
         temperature=0.7,
         google_api_key=api_key,
     )
-    prompt = state.get("_prompt", "")  # type: ignore[arg-type]
+    prompt = state.get("prompt", "")  # type: ignore[arg-type]
     response = await llm.ainvoke([HumanMessage(content=prompt)])
     return {"raw_plan": response.content if hasattr(response, "content") else str(response)}
 
@@ -151,7 +151,7 @@ async def refine_plan_node(state: TravelPlanState) -> dict[str, Any]:
     state["attempts"] = state.get("attempts", 0) + 1  # type: ignore[typeddict-item]
     # mutate the prompt with the validation error, then re-call generate
     err = state.get("error", "")
-    state["_prompt"] = (state.get("_prompt", "") +  # type: ignore[typeddict-item]
+    state["prompt"] = (state.get("prompt", "") +  # type: ignore[typeddict-item]
                        f"\n\nPrevious attempt failed: {err}\nReturn corrected JSON only.")
     out = await generate_plan_node(state)
     return out

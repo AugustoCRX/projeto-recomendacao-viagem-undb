@@ -42,7 +42,7 @@ def test_tc22_prompt_includes_weather_and_country():
         "preferences": "vegetarian",
     }
     out = nodes.build_prompt_node(state)
-    prompt = out["_prompt"]
+    prompt = out["prompt"]
 
     assert "Lisboa" in prompt and "Portugal" in prompt
     assert "sunny" in prompt          # weather context propagated
