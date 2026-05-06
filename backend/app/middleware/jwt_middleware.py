@@ -32,8 +32,8 @@ PUBLIC_PATHS: frozenset[str] = frozenset(
         "/api/v1/external/country",
         "/api/v1/external/exchange",
         "/api/v1/external/images",
-        "/api/v1/docs",
-        "/api/v1/docs/raw",
+        "/api/v1/docs-md",
+        "/api/v1/docs-md/raw",
         # FastAPI built-in docs
         "/docs",
         "/redoc",

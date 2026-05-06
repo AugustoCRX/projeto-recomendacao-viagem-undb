@@ -1,132 +1,144 @@
-# travel-planner
+# Smart Travel Planner — Backend
 
-travel planner app
+FastAPI backend in **MVT** layout (Models / Views / Templates a.k.a. Schemas),
+backed by PostgreSQL (Supabase in cloud, vanilla Postgres locally). Deployable
+as a single Docker image on Render or any container host.
 
-## Development Requirements
+> Full developer guide with diagrams: `GET /api/v1/docs-md`
+> (or read [`documentation.md`](./documentation.md) directly).
 
-- Python 3.11+
-- Uv (Python Package Manager)
+## Quick start (Docker, recommended)
 
-### M.L Model Environment
-
-```sh
-MODEL_PATH=./ml/model/
-MODEL_NAME=model.pkl
+```bash
+cp .env.example .env       # adjust SECRET_KEY + API keys
+docker compose up --build  # API at http://localhost:8000
 ```
 
-### Update `/predict`
+The Postgres container auto-applies [`../db/schema.sql`](../db/schema.sql) on
+first boot. Visit:
 
-To update your machine learning model, add your `load` and `method` [change here](app/api/routes/predictor.py#L19) at `predictor.py`
+- `http://localhost:8000/docs` — Swagger UI
+- `http://localhost:8000/api/v1/docs-md` — project docs (with Mermaid diagrams)
+- `http://localhost:8000/health` — liveness probe
 
-## Installation
+## Quick start (local Python)
 
-```sh
-python -m venv venv
-source venv/bin/activate
-make install
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install uv && uv pip install -e ".[dev]"
+export PYTHONPATH=$PWD/app
+uvicorn app.main:app --reload --port 8000
 ```
 
-## Runnning Localhost
+## Layout
 
-`make run`
+```
+backend/
+├── app/
+│   ├── main.py            FastAPI factory, CORS, JWT middleware, /health
+│   ├── urls.py            single router mount point
+│   ├── db.py              SQLAlchemy engine + SessionLocal + Base
+│   ├── deps.py            get_db, get_current_user
+│   ├── core/              config, security, errors, events, logging
+│   ├── middleware/        jwt_middleware
+│   ├── models/            [M] SQLAlchemy ORM
+│   ├── schemas/           [T] Pydantic v2 DTOs
+│   ├── views/             [V] FastAPI routers + business logic
+│   ├── services/          external API clients + TTL cache
+│   └── ai/                LangGraph travel-plan agent
+├── documentation.md       served at /api/v1/docs-md
+├── Dockerfile
+├── docker-compose.yml
+├── pyproject.toml
+└── .env.example
+```
 
-## Deploy app
+## Tests
 
-`make deploy`
+`pytest` is the test runner; FastAPI's `TestClient` (built on `httpx`) drives the
+HTTP layer. Tests live under `backend/tests/`.
 
-## Running Tests
+### Run inside Docker (recommended — matches CI)
 
-`make test`
+```bash
+docker compose run --rm app pytest -vv
+# only one file
+docker compose run --rm app pytest tests/test_auth.py -vv
+# with coverage
+docker compose run --rm app pytest --cov=. --cov-report=term-missing
+```
 
-## Access Swagger Documentation
+### Run locally
 
-> <http://localhost:8080/docs>
+```bash
+pip install uv && uv pip install -e ".[dev]"
+export PYTHONPATH=$PWD/app
+# minimal env to satisfy core/config at import time
+export SECRET_KEY=test-secret DATABASE_URL=sqlite:///./_test.db
+pytest -vv
+```
 
-## Access Redocs Documentation
+### Or via the Makefile
 
-> <http://localhost:8080/redoc>
+```bash
+make test     # installs deps + runs pytest tests -vv
+```
 
-## Project structure
+### Writing tests
 
-Files related to application are in the `app` or `tests` directories.
-Application parts are:
+Use `TestClient(app)` and override `deps.get_db` to inject an in-memory SQLite
+session so suites are hermetic:
 
-    app
-    |
-    | # Fast-API stuff
-    ├── api                 - web related stuff.
-    │   └── routes          - web routes.
-    ├── core                - application configuration, startup events, logging.
-    ├── models              - pydantic models for this application.
-    ├── services            - logic that is not just crud related.
-    ├── main-aws-lambda.py  - [Optional] FastAPI application for AWS Lambda creation and configuration.
-    └── main.py             - FastAPI application creation and configuration.
-    |
-    | # ML stuff
-    ├── data             - where you persist data locally
-    │   ├── interim      - intermediate data that has been transformed.
-    │   ├── processed    - the final, canonical data sets for modeling.
-    │   └── raw          - the original, immutable data dump.
-    │
-    ├── notebooks        - Jupyter notebooks. Naming convention is a number (for ordering),
-    |
-    ├── ml               - modelling source code for use in this project.
-    │   ├── __init__.py  - makes ml a Python module
-    │   ├── pipeline.py  - scripts to orchestrate the whole pipeline
-    │   │
-    │   ├── data         - scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features     - scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   └── model        - scripts to train models and make predictions
-    │       ├── predict_model.py
-    │       └── train_model.py
-    │
-    └── tests            - pytest
+```python
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from main import app
+from db import Base
+from deps import get_db
 
-## GCP
+engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+TestSession = sessionmaker(bind=engine)
+Base.metadata.create_all(engine)
 
-Deploying inference service to Cloud Run
+def _override_db():
+    db = TestSession()
+    try: yield db
+    finally: db.close()
 
-### Authenticate
+app.dependency_overrides[get_db] = _override_db
+client = TestClient(app)
 
-1. Install `gcloud` cli
-2. `gcloud auth login`
-3. `gcloud config set project <PROJECT_ID>`
+def test_register_then_login():
+    r = client.post("/api/v1/auth/register",
+                    json={"name":"Ana","email":"a@x.com","password":"pass1234"})
+    assert r.status_code == 201
+    token = r.json()["token"]
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 200
+```
 
-### Enable APIs
+> Note: the legacy `tests/test_*` files target the removed ML predictor and
+> should be deleted/rewritten against the new MVT views as features land.
 
-1. Cloud Run API
-2. Cloud Build API
-3. IAM API
+## Environment
 
-### Deploy to Cloud Run
+All config lives in `.env` (never committed). See `.env.example` for the full
+list and how to obtain free-tier API keys.
 
-1. Run `gcp-deploy.sh`
+## Architecture principles
 
-### Clean up
+- **Modular monolith** — one deployable unit, organized by feature folders.
+- **SOLID** — views depend on schemas + services (abstractions), not on each other.
+  Swapping the AI provider only touches `ai/nodes.py`; swapping the weather
+  provider only touches `services/weather.py`.
+- **Cloud-native** — stateless API, in-memory cache OK to lose, all state in
+  Postgres, secrets via env vars.
 
-1. Delete Cloud Run
-2. Delete Docker image in GCR
+## Cloud deploy (Render + Supabase)
 
-## AWS
-
-Deploying inference service to AWS Lambda
-
-### Authenticate
-
-1. Install `awscli` and `sam-cli`
-2. `aws configure`
-
-### Deploy to Lambda
-
-1. Run `sam build`
-2. Run `sam deploy --guiChange this portion for other types of models
-
-## Add the correct type hinting when completed
-
-`aws cloudformation delete-stack --stack-name <STACK_NAME_ON_CREATION>`
-
-Made by <https://github.com/arthurhenrique/cookiecutter-fastapi/graphs/contributors> with ❤️
+1. Create a Supabase project and copy the pooler `DATABASE_URL`.
+2. Run `psql "$DATABASE_URL" -f db/schema.sql` once.
+3. On Render → New Web Service → Docker → root `backend/`. Health path `/health`.
+4. Paste env vars from `.env.example` into Render dashboard.
+5. Point your frontend `VITE_BACKEND_URL` to the new Render URL.
