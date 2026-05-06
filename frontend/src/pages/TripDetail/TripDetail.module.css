@@ -91,6 +91,8 @@
 .infoCard > a,
 .infoCard > button {
   margin: 0 var(--space-4) var(--space-3);
+  width: auto;
+  align-self: stretch;
 }
 
 .infoCard > a:first-of-type,

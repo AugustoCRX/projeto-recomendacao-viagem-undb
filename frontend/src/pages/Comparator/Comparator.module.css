@@ -176,10 +176,12 @@
 .flag {
   height: 22px;
   width: auto;
+  max-width: 44px;
+  align-self: flex-start;
   border-radius: var(--radius-xs);
   border: 1px solid var(--color-border);
   margin-bottom: var(--space-2);
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* ── Empty state ─────────────────────────────────────────────────── */

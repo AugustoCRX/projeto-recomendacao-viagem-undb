@@ -26,17 +26,19 @@ export function TripCard({ trip, onRemove }) {
       <Link to={detailPath} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className={styles.cover} style={coverStyle}>
           <div className={styles.coverOverlay} />
+          <div className={styles.coverContent}>
+            <p className={styles.name}>{trip.name}</p>
+            <p className={styles.destination}>
+              <span>📍</span>
+              {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+            </p>
+          </div>
           <div className={styles.badgePosition}>
             <Badge status={trip.status} />
           </div>
         </div>
 
         <div className={styles.body}>
-          <p className={styles.name}>{trip.name}</p>
-          <p className={styles.destination}>
-            <span>📍</span>
-            {trip.destination}{trip.country ? `, ${trip.country}` : ''}
-          </p>
 
           <div className={styles.meta}>
             {trip.startDate && (

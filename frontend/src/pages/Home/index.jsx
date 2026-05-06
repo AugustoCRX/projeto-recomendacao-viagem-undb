@@ -27,7 +27,7 @@ export default function HomePage() {
     <PageLayout>
       <PageHeader
         title="Minhas Viagens"
-        subtitle={`${trips.length} viagen${trips.length !== 1 ? 's' : ''} cadastrada${trips.length !== 1 ? 's' : ''}`}
+        subtitle={`${trips.length} ${trips.length !== 1 ? 'viagens' : 'viagem'} cadastrada${trips.length !== 1 ? 's' : ''}`}
         actions={
           <Button as={Link} to={ROUTES.TRIP_CREATE}>
             + Nova viagem
