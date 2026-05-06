@@ -120,7 +120,14 @@ def _is_quota_error(exc: Exception) -> bool:
 
 
 def _build_llm(provider: str, model: str):
-    """Factory: return a configured LangChain chat client for the provider."""
+    """Factory: return a configured LangChain chat client for the provider.
+
+    Important: every provider here is created with ``max_retries=0`` and a
+    short ``timeout``. We want 429/503 errors to surface to our outer fallback
+    loop *immediately*, instead of being swallowed by each SDK's internal
+    exponential-backoff retry. Otherwise the request hangs for 30-60 s on a
+    single provider and never tries the next one.
+    """
     from core.config import (
         GOOGLE_API_KEY,
         GROQ_API_KEY,
@@ -132,7 +139,13 @@ def _build_llm(provider: str, model: str):
         key = str(GOOGLE_API_KEY)
         if not key:
             return None
-        return ChatGoogleGenerativeAI(model=model, temperature=0.7, google_api_key=key)
+        return ChatGoogleGenerativeAI(
+            model=model,
+            temperature=0.7,
+            google_api_key=key,
+            max_retries=0,
+            timeout=30,
+        )
 
     if provider == "groq":
         try:
@@ -143,7 +156,13 @@ def _build_llm(provider: str, model: str):
         key = str(GROQ_API_KEY)
         if not key:
             return None
-        return ChatGroq(model=model, temperature=0.7, api_key=key)
+        return ChatGroq(
+            model=model,
+            temperature=0.7,
+            api_key=key,
+            max_retries=0,
+            timeout=30,
+        )
 
     if provider == "openrouter":
         # OpenRouter implements the OpenAI Chat Completions API.
@@ -160,6 +179,8 @@ def _build_llm(provider: str, model: str):
             temperature=0.7,
             api_key=key,
             base_url="https://openrouter.ai/api/v1",
+            max_retries=0,
+            timeout=30,
         )
 
     logger.warning(f"Unknown AI provider: {provider!r}")
