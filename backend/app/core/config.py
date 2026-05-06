@@ -51,6 +51,11 @@ CORS_ORIGINS: list[str] = list(
     )
 )
 
+CORS_ORIGIN_REGEX: str = config(
+    "CORS_ORIGIN_REGEX",
+    default=r"https://.*\.vercel\.app",
+)
+
 # ── External APIs ─────────────────────────────────────────────────────────────
 OPENWEATHER_API_KEY: Secret = config("OPENWEATHER_API_KEY", cast=Secret, default="")
 EXCHANGERATE_API_KEY: Secret = config("EXCHANGERATE_API_KEY", cast=Secret, default="")
