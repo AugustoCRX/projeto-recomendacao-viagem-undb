@@ -4,6 +4,23 @@ FastAPI backend in **MVT** layout (Models / Views / Templates a.k.a. Schemas),
 backed by PostgreSQL (Supabase in cloud, vanilla Postgres locally). Deployable
 as a single Docker image on Render or any container host.
 
+
+## 🌐 Live deployment (Render)
+
+Base URL: **<https://smart-travel-planner-api-4sx8.onrender.com>**
+
+| Recurso | URL |
+|---------|-----|
+| Swagger UI (OpenAPI interativo) | <https://smart-travel-planner-api-4sx8.onrender.com/docs> |
+| ReDoc | <https://smart-travel-planner-api-4sx8.onrender.com/redoc> |
+| Documentação + diagramas Mermaid (HTML) | <https://smart-travel-planner-api-4sx8.onrender.com/api/v1/docs-md> |
+| Documentação em markdown bruto (JSON) | <https://smart-travel-planner-api-4sx8.onrender.com/api/v1/docs-md/raw> |
+| Health probe | <https://smart-travel-planner-api-4sx8.onrender.com/health> |
+| OpenAPI schema | <https://smart-travel-planner-api-4sx8.onrender.com/openapi.json> |
+
+> O plano free do Render dorme após 15 min de inatividade — o primeiro request
+> pode levar ~30 s para acordar.
+
 > Full developer guide with diagrams: `GET /api/v1/docs-md`
 > (or read [`documentation.md`](./documentation.md) directly).
 
