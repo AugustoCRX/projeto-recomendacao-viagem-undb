@@ -14,10 +14,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.config import API_PREFIX, CORS_ORIGINS, DEBUG, PROJECT_NAME, VERSION
 from core.events import create_start_app_handler
 from middleware.jwt_middleware import JWTMiddleware
 from urls import router as api_router
+
+from core.config import (
+    API_PREFIX, CORS_ORIGIN_REGEX, CORS_ORIGINS,
+    DEBUG, PROJECT_NAME, VERSION,
+)
 
 
 def get_application() -> FastAPI:
@@ -42,6 +46,7 @@ def get_application() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=CORS_ORIGINS,
+        allow_origin_regex=CORS_ORIGIN_REGEX or None,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
