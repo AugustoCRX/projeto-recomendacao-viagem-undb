@@ -40,47 +40,51 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.brand}>
-          <div className={styles.logoMark}>✈</div>
-          <h1 className={styles.title}>Entrar</h1>
-          <p className={styles.subtitle}>Acesse seu planejador de viagens</p>
+      <div className={styles.formPanel}>
+        <div className={styles.card}>
+          <div className={styles.brand}>
+            <div className={styles.logoMark}>✈</div>
+            <h1 className={styles.title}>Entrar</h1>
+            <p className={styles.subtitle}>Acesse seu planejador de viagens</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className={styles.form} noValidate>
+            <Input
+              label="E-mail"
+              type="email"
+              placeholder="voce@email.com"
+              value={form.email}
+              onChange={(e) => setField('email', e.target.value)}
+              required
+              autoComplete="email"
+            />
+            <Input
+              label="Senha"
+              type="password"
+              placeholder="Sua senha"
+              value={form.password}
+              onChange={(e) => setField('password', e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+
+            {error && <p className={styles.errorMsg}>{error}</p>}
+
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? 'Entrando…' : 'Entrar'}
+            </Button>
+          </form>
+
+          <p className={styles.footer}>
+            Não tem uma conta?{' '}
+            <Link to={ROUTES.REGISTER} className={styles.link}>
+              Criar conta
+            </Link>
+          </p>
         </div>
-
-        <form onSubmit={handleSubmit} className={styles.form} noValidate>
-          <Input
-            label="E-mail"
-            type="email"
-            placeholder="voce@email.com"
-            value={form.email}
-            onChange={(e) => setField('email', e.target.value)}
-            required
-            autoComplete="email"
-          />
-          <Input
-            label="Senha"
-            type="password"
-            placeholder="Sua senha"
-            value={form.password}
-            onChange={(e) => setField('password', e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-
-          {error && <p className={styles.errorMsg}>{error}</p>}
-
-          <Button type="submit" fullWidth disabled={loading}>
-            {loading ? 'Entrando…' : 'Entrar'}
-          </Button>
-        </form>
-
-        <p className={styles.footer}>
-          Não tem uma conta?{' '}
-          <Link to={ROUTES.REGISTER} className={styles.link}>
-            Criar conta
-          </Link>
-        </p>
       </div>
+
+      <div className={styles.imagePanel} aria-hidden="true" />
     </div>
   );
 }

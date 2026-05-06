@@ -1,216 +1,398 @@
-# Travel Planner — Projeto de Recomendação de Viagem
+# Smart Travel Planner ✈️
 
-Aplicação full-stack de planejamento e recomendação de viagens desenvolvida como projeto acadêmico na UNDB. Permite criar roteiros completos com itinerário dia a dia, exploração de pontos de interesse em mapa interativo, previsão do tempo e conversão de moedas para o destino.
+Sistema completo de planejamento de viagens com inteligência artificial, comparação de destinos, conversão de câmbio e gestão de roteiros.
+
+## Visão Geral
+
+O Smart Travel Planner é uma aplicação full-stack que permite criar e gerenciar viagens com auxílio de IA. O usuário pode planejar roteiros, salvar lugares de interesse, comparar destinos e converter moedas — tudo em uma interface moderna e responsiva.
+
+## Funcionalidades
+
+| Funcionalidade | Descrição |
+|---|---|
+| **Autenticação** | Cadastro, login, sessão persistente via JWT, troca de senha |
+| **Gestão de Viagens** | Criar, editar, excluir e visualizar viagens com foto de capa e detalhes |
+| **Planejador com IA** | Geração de roteiro completo via Gemini + LangGraph com base em preferências |
+| **Lugares Salvos** | Marcar e gerenciar pontos de interesse por tipo (restaurante, hotel, atrativo…) |
+| **Comparador de Destinos** | Comparar dois destinos lado a lado (clima, custo, idioma, fuso etc.) |
+| **Conversor de Câmbio** | Conversão em tempo real entre moedas via API externa |
+| **Mapa Interativo** | Visualização de lugares no mapa com React Leaflet |
+| **Perfil do Usuário** | Página de configurações para alterar senha |
 
 ---
 
-## Stack
+## Arquitetura
 
-| Camada | Tecnologias |
-|--------|-------------|
-| Frontend | React 19, React Router 7, Vite 8, CSS Modules |
-| Mapas | Leaflet + React-Leaflet 5, Overpass API (OpenStreetMap) |
-| Backend | FastAPI, SQLAlchemy 2, Alembic, Python 3.11+ |
-| Banco de dados | PostgreSQL (produção) / SQLite (dev) |
-| Autenticação | JWT (python-jose) + bcrypt (passlib) |
-| ML / IA | LangGraph, LangChain + Google Generative AI, scikit-learn (joblib) |
-| APIs externas | OpenWeatherMap, Unsplash, ExchangeRate API, REST Countries |
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENTE                              │
+│  React 19 + Vite  ──  CSS Modules  ──  React Router v7      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTPS / REST
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                        BACKEND                              │
+│  FastAPI + SQLAlchemy  ──  JWT Auth  ──  LangGraph Agent    │
+│                        │                                    │
+│         Gemini API ◄───┘                                    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ PostgreSQL (Supabase)
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      BANCO DE DADOS                         │
+│  users · trips · places · itinerary_items                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Deploy:**
+- **Frontend** → Vercel (build estático + SPA routing via `vercel.json`)
+- **Backend** → Render (container Python)
+- **Banco** → Supabase (PostgreSQL gerenciado)
 
 ---
 
-## Estrutura do projeto
+## Stack Tecnológica
+
+### Frontend
+
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| React | 19 | UI framework |
+| Vite | 8 | Build tool |
+| React Router | v7 | Roteamento SPA |
+| React Leaflet | latest | Mapas interativos |
+| CSS Modules | — | Estilização escopada |
+| Inter (Google Fonts) | — | Tipografia |
+
+### Backend
+
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| Python | 3.11+ | Runtime |
+| FastAPI | latest | API REST |
+| SQLAlchemy | latest | ORM |
+| Alembic | latest | Migrações |
+| LangGraph | latest | Orquestração do agente IA |
+| LangChain Google GenAI | latest | Integração com Gemini |
+| python-jose | latest | JWT |
+| passlib + bcrypt | latest | Hash de senha |
+| psycopg2 | latest | Driver PostgreSQL |
+
+---
+
+## Estrutura do Projeto
 
 ```
 projeto-recomendacao-viagem-undb/
 ├── backend/
 │   ├── app/
-│   │   ├── api/routes/       # Rotas FastAPI
-│   │   ├── core/             # config, security (JWT/bcrypt), logging, paginação
-│   │   ├── middleware/       # JWTMiddleware
-│   │   ├── models/           # ORM SQLAlchemy (User, Trip, Place, ItineraryItem)
-│   │   └── services/         # Serviço de predição ML
-│   └── tests/
+│   │   ├── main.py                  # Entry point FastAPI
+│   │   ├── database.py              # Configuração SQLAlchemy
+│   │   ├── models.py                # Modelos ORM
+│   │   ├── schemas.py               # Schemas Pydantic
+│   │   ├── auth.py                  # Lógica JWT e hashing
+│   │   ├── dependencies.py          # get_current_user
+│   │   ├── urls.py                  # Registro de routers
+│   │   └── routers/
+│   │       ├── auth.py              # /api/v1/auth/*
+│   │       ├── trips.py             # /api/v1/trips/*
+│   │       ├── places.py            # /api/v1/places/*
+│   │       ├── itinerary.py         # /api/v1/itinerary/*
+│   │       └── ai_planner.py        # /api/v1/ai/*
+│   ├── .env                         # Variáveis de ambiente (não commitado)
+│   ├── requirements.txt
+│   └── Dockerfile
 ├── frontend/
-│   └── src/
-│       ├── components/       # Layout, UI, Map compartilhados
-│       ├── constants/        # URLs de API, rotas, enums
-│       ├── features/         # Módulos por domínio (auth, trips, itinerary, map…)
-│       ├── pages/            # Páginas do roteador
-│       ├── router/           # Definição de rotas + ProtectedRoute
-│       └── services/api/     # backendClient + integrações externas
-└── db/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── layout/              # Header, Layout, Sidebar
+│   │   │   └── ui/                  # Button, Badge, Spinner, PlaceCard…
+│   │   ├── features/
+│   │   │   ├── auth/                # AuthContext, serviços, hooks
+│   │   │   ├── trips/               # TripCard, TripForm, hooks
+│   │   │   ├── places/              # PlaceCard, PlaceForm
+│   │   │   ├── currency/            # CurrencyConverter
+│   │   │   └── ai-planner/          # AIPlannerForm, resultado
+│   │   ├── pages/
+│   │   │   ├── Home/                # Lista de viagens
+│   │   │   ├── Login/               # Autenticação
+│   │   │   ├── Register/            # Cadastro
+│   │   │   ├── TripDetail/          # Detalhe da viagem
+│   │   │   ├── Comparator/          # Comparação de destinos
+│   │   │   └── Profile/             # Configurações do usuário
+│   │   ├── router/                  # ProtectedRoute, index.jsx
+│   │   ├── constants/               # ROUTES, API URLs
+│   │   └── styles/                  # index.css, tokens CSS
+│   ├── nginx.conf                   # Config nginx para Docker
+│   ├── vercel.json                  # Rewrite SPA para Vercel
+│   └── Dockerfile
+└── docker-compose.yml               # Orquestração local (sem banco — usa Supabase)
 ```
 
-### Módulos do frontend (`src/features/`)
+---
 
-| Módulo | Componentes | Hooks | Serviço |
-|--------|-------------|-------|---------|
-| `auth` | — | `useAuth` | `authService` (mock + HTTP) |
-| `trips` | TripCard, TripForm | useTrips, useTripDetail, useCreateTrip, useDestinationPhoto | `tripsRepository` (cache local ou HTTP) |
-| `itinerary` | ActivityCard, ActivityForm, DayColumn | `useItinerary` | `itineraryCache` |
-| `places` | PlaceCard | usePlaces, usePlacesByDestination | `placesCache` |
-| `map` | — | useGeocode, useOverpassPlaces | Overpass API direto |
-| `weather` | WeatherForecast, WeatherWidget | `useWeather` | OpenWeatherMap |
-| `country` | CountryInfo | `useCountry` | REST Countries |
+## Banco de Dados
+
+### Tabelas
+
+#### `users`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | UUID (PK) | Identificador único |
+| name | VARCHAR | Nome do usuário |
+| email | VARCHAR (unique) | E-mail de login |
+| hashed_password | VARCHAR | Senha com bcrypt |
+| created_at | TIMESTAMP | Data de criação |
+
+#### `trips`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | UUID (PK) | Identificador único |
+| user_id | UUID (FK → users) | Dono da viagem |
+| name | VARCHAR | Nome da viagem |
+| destination | VARCHAR | Destino principal |
+| start_date | DATE | Data de início |
+| end_date | DATE | Data de término |
+| budget | NUMERIC | Orçamento estimado |
+| status | VARCHAR | `planning`, `ongoing`, `completed` |
+| cover_image_url | VARCHAR | URL da imagem de capa |
+| notes | TEXT | Anotações livres |
+| created_at | TIMESTAMP | Data de criação |
+
+#### `places`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | UUID (PK) | Identificador único |
+| trip_id | UUID (FK → trips) | Viagem relacionada |
+| name | VARCHAR | Nome do lugar |
+| type | VARCHAR | `restaurant`, `hotel`, `attraction`, `other` |
+| address | VARCHAR | Endereço |
+| latitude | FLOAT | Coordenada lat |
+| longitude | FLOAT | Coordenada lng |
+| notes | TEXT | Observações |
+| created_at | TIMESTAMP | Data de criação |
+
+#### `itinerary_items`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | UUID (PK) | Identificador único |
+| trip_id | UUID (FK → trips) | Viagem relacionada |
+| day | INTEGER | Dia do roteiro (1, 2, 3…) |
+| time | VARCHAR | Horário sugerido |
+| activity | TEXT | Descrição da atividade |
+| place_id | UUID (FK → places) | Lugar vinculado (opcional) |
+| created_at | TIMESTAMP | Data de criação |
 
 ---
 
-## Funcionalidades implementadas
+## API Endpoints
 
-### Frontend
-- **Home** — listagem de viagens com filtro por status (planejando, confirmado, em andamento, concluído)
-- **Criar viagem** — formulário com destino, datas, orçamento, moeda, notas e foto de capa automática (Unsplash)
-- **Detalhe da viagem** — foto hero, previsão do tempo, dados do país, lugares por categoria (atrações, restaurantes, hospedagens)
-- **Itinerário** — quadro kanban dia a dia com adição, edição e remoção de atividades
-- **Mapa interativo** — mapa Leaflet com POIs do Overpass API, filtro por categoria, destaque de lugar selecionado
-- **Autenticação** — páginas de login e cadastro com validação; `AuthContext` persiste token no `localStorage`; `ProtectedRoute` redireciona para `/login` se não autenticado
-- **Modo mock** — variável `VITE_MOCK_AUTH=true` simula auth sem backend; `VITE_USE_BACKEND=true` ativa as chamadas reais para trips
+### Autenticação — `/api/v1/auth`
 
-### Backend
-- **Modelos ORM** — `User`, `Trip`, `Place`, `ItineraryItem` mapeados para PostgreSQL
-- **Segurança** — `hash_password`, `verify_password`, `create_access_token`, `verify_token` em `core/security.py`
-- **JWT Middleware** — `JWTMiddleware` rejeita requisições sem token válido; paths públicos definidos em `PUBLIC_PATHS`
-- **Rota de predição ML** — `POST /api/v1/predict` e `GET /api/v1/health` (modelo sklearn via joblib)
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| POST | `/register` | Cadastrar novo usuário | — |
+| POST | `/login` | Login, retorna JWT | — |
+| GET | `/me` | Retorna usuário logado | ✅ |
+| PUT | `/change-password` | Alterar senha | ✅ |
+
+### Viagens — `/api/v1/trips`
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/` | Listar viagens do usuário | ✅ |
+| POST | `/` | Criar viagem | ✅ |
+| GET | `/{trip_id}` | Detalhe da viagem | ✅ |
+| PUT | `/{trip_id}` | Editar viagem | ✅ |
+| DELETE | `/{trip_id}` | Excluir viagem | ✅ |
+
+### Lugares — `/api/v1/places`
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/trip/{trip_id}` | Lugares de uma viagem | ✅ |
+| POST | `/` | Adicionar lugar | ✅ |
+| PUT | `/{place_id}` | Editar lugar | ✅ |
+| DELETE | `/{place_id}` | Remover lugar | ✅ |
+
+### Roteiro — `/api/v1/itinerary`
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/trip/{trip_id}` | Roteiro de uma viagem | ✅ |
+| POST | `/` | Adicionar item | ✅ |
+| PUT | `/{item_id}` | Editar item | ✅ |
+| DELETE | `/{item_id}` | Remover item | ✅ |
+
+### IA — `/api/v1/ai`
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| POST | `/plan` | Gerar roteiro com IA (Gemini) | ✅ |
 
 ---
 
-## Configuração
+## Variáveis de Ambiente
 
-### Pré-requisitos
-- Python 3.11+ com [uv](https://github.com/astral-sh/uv)
-- Node.js 20+
-- PostgreSQL (ou use SQLite para desenvolvimento local)
+### Backend (`backend/.env`)
 
-### Backend
+```env
+# Banco de dados (Supabase)
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+
+# JWT
+SECRET_KEY=sua-chave-secreta-de-64-chars
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+# Google Gemini
+GOOGLE_API_KEY=sua-chave-gemini
+
+# CORS
+CORS_ORIGINS=http://localhost:5173,http://localhost,https://seu-frontend.vercel.app
+```
+
+### Frontend (`.env` ou variáveis Vercel)
+
+```env
+# URL do backend (vazio para Docker com nginx proxy, URL completa para Vercel)
+VITE_API_BASE_URL=https://smart-travel-planner-api-4sx8.onrender.com
+
+# Desativar mock e usar backend real
+VITE_USE_BACKEND=true
+VITE_MOCK_AUTH=false
+```
+
+> **Nota:** No ambiente Docker, `VITE_API_BASE_URL` deve ser vazio (`""`). O nginx faz o proxy de `/api/` para o container do backend internamente. No Vercel, deve conter a URL completa do Render.
+
+---
+
+## Como Executar
+
+### Opção 1 — Docker (recomendado)
+
+Requer Docker Desktop instalado e `backend/.env` configurado.
 
 ```bash
+# Build e iniciar todos os serviços
+docker compose up --build
+
+# Acessar em http://localhost
+```
+
+Para reconstruir após mudanças:
+
+```bash
+docker compose down && docker compose up --build
+```
+
+### Opção 2 — Desenvolvimento Local
+
+**Backend:**
+```bash
 cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Mac/Linux
 
-# criar ambiente e instalar dependências
-uv venv && uv pip install -e ".[dev]"
+pip install -r requirements.txt
 
-# copiar e preencher variáveis de ambiente
-cp .env.example .env
-
-# rodar servidor de desenvolvimento
+# Configurar .env com DATABASE_URL, SECRET_KEY, GOOGLE_API_KEY
 uvicorn app.main:app --reload --port 8000
 ```
 
 Documentação interativa disponível em `http://localhost:8000/docs`.
 
-### Frontend
+**Frontend:**
+```bash
+cd frontend
+npm install
+
+# Criar .env.local
+VITE_API_BASE_URL=http://localhost:8000
+VITE_USE_BACKEND=true
+VITE_MOCK_AUTH=false
+
+npm run dev
+# Acessa em http://localhost:5173
+```
+
+### Opção 3 — Modo Demo (sem backend)
+
+O frontend possui um mock completo. Todas as funcionalidades funcionam com dados simulados — sem necessidade de banco ou backend.
 
 ```bash
 cd frontend
-
 npm install
-
-# copiar e preencher variáveis de ambiente
-cp .env.example .env   # ou edite o .env existente
-
-npm run dev   # http://localhost:5173
+npm run dev
+# VITE_MOCK_AUTH e VITE_USE_BACKEND omitidos = modo demo ativo
 ```
 
 ---
 
-## Variáveis de ambiente
+## Deploy
 
-### Backend — `backend/.env`
+### Backend → Render
 
-| Variável | Obrigatória | Descrição |
-|----------|-------------|-----------|
-| `SECRET_KEY` | Sim | Chave para assinar os JWTs |
-| `DATABASE_URL` | Sim | Ex.: `postgresql://user:pass@localhost:5432/travel` |
-| `DEBUG` | Não | `True` em desenvolvimento |
-| `JWT_ALGORITHM` | Sim | Algoritmo JWT (ex.: `HS256`) |
-| `ACCESS_TOKEN_EXPIRE_DAYS` | Sim | Validade do token em dias |
+1. Criar um **Web Service** no Render apontando para o repositório
+2. **Root Directory:** `backend`
+3. **Build command:** `pip install -r requirements.txt`
+4. **Start command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Adicionar as variáveis de ambiente no painel: `DATABASE_URL`, `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `GOOGLE_API_KEY`, `CORS_ORIGINS`
 
-### Frontend — `frontend/.env`
+### Frontend → Vercel
 
-| Variável | Obrigatória | Descrição |
-|----------|-------------|-----------|
-| `VITE_API_BASE_URL` | Sim | URL base do backend (ex.: `http://localhost:8000`) |
-| `VITE_MOCK_AUTH` | Não | `true` para usar auth em memória sem backend |
-| `VITE_USE_BACKEND` | Não | `true` para buscar trips do backend (padrão: `localStorage`) |
-| `VITE_OPENWEATHER_API_KEY` | Sim | Chave da API OpenWeatherMap |
-| `VITE_UNSPLASH_ACCESS_KEY` | Sim | Chave da API Unsplash |
-| `VITE_EXCHANGERATE_API_KEY` | Não | Chave da ExchangeRate API |
+1. Importar o repositório no Vercel
+2. **Root Directory:** `frontend`
+3. Adicionar variáveis de ambiente:
+   - `VITE_API_BASE_URL` = URL do serviço no Render (ex.: `https://smart-travel-planner-api-4sx8.onrender.com`)
+   - `VITE_USE_BACKEND` = `true`
+   - `VITE_MOCK_AUTH` = `false`
+4. O arquivo `vercel.json` já está configurado com o rewrite necessário para SPA routing
 
 ---
 
-## Contrato de API
+## Fluxo do Planejador com IA
 
-### Rotas públicas (sem autenticação)
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/v1/auth/register` | Cadastro — `{ name, email, password }` |
-| POST | `/api/v1/auth/login` | Login — `{ email, password }` |
-| GET | `/api/v1/external/weather` | Proxy clima |
-| GET | `/api/v1/external/places` | Proxy lugares |
-| GET | `/api/v1/external/country` | Proxy dados do país |
-| GET | `/api/v1/external/exchange` | Proxy câmbio |
-| GET | `/api/v1/external/images` | Proxy Unsplash |
-| GET | `/health` | Health check |
-
-### Resposta de autenticação esperada
-
-```json
-{
-  "access_token": "<jwt>",
-  "token_type": "bearer",
-  "user": { "id": "<uuid>", "name": "...", "email": "..." }
-}
+```
+Usuário preenche preferências (destino, datas, interesses, orçamento)
+        │
+        ▼
+POST /api/v1/ai/plan
+        │
+        ▼
+LangGraph Agent
+  ├── Node: parse_preferences    ← interpreta entrada do usuário
+  ├── Node: research_destination ← Gemini pesquisa sobre o destino
+  ├── Node: build_itinerary      ← Gemini monta roteiro dia a dia
+  └── Node: format_response      ← estrutura JSON padronizado
+        │
+        ▼
+JSON com dias, atividades, horários, dicas e sugestões
+        │
+        ▼
+Frontend renderiza roteiro interativo com edição e salvamento
 ```
 
-### Rotas protegidas (requerem `Authorization: Bearer <token>`)
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/v1/trips` | Listar viagens do usuário |
-| POST | `/api/v1/trips` | Criar viagem |
-| GET | `/api/v1/trips/:id` | Detalhe da viagem |
-| PUT | `/api/v1/trips/:id` | Atualizar viagem |
-| DELETE | `/api/v1/trips/:id` | Remover viagem |
-
-### Modelos de dados (banco)
-
-**Trip** — `id`, `user_id`, `name`, `destination`, `country`, `start_date`, `end_date`, `budget`, `currency` (padrão `BRL`), `status` (`planning` | `confirmed` | `ongoing` | `completed` | `cancelled`), `notes`, `cover_photo`
-
-**Place** — `id`, `trip_id`, `user_id`, `name`, `address`, `lat`, `lng`, `category` (`tourist_attraction` | `restaurant` | `lodging` | `other`), `place_id` (ID do OSM/Google)
-
-**ItineraryItem** — `id`, `trip_id`, `user_id`, `place_id?`, `date`, `time` (HH:mm), `title`, `description`, `order`
-
 ---
 
-## Status de desenvolvimento
+## APIs Externas
 
-### Concluído
-- [x] Estrutura monorepo backend/frontend
-- [x] Modelos ORM (User, Trip, Place, ItineraryItem)
-- [x] Infraestrutura JWT (security.py + JWTMiddleware)
-- [x] Páginas de autenticação (Login, Register) com mock e modo HTTP
-- [x] CRUD de viagens no frontend (com cache em `localStorage`)
-- [x] Itinerário dia a dia (cache local)
-- [x] Mapa interativo com Overpass API
-- [x] Widgets de clima, info do país, conversão de moeda
-- [x] `backendClient` com injeção automática de token e interceptor de 401
-
-### Pendente no backend
-- [ ] Adicionar `JWT_ALGORITHM` e `ACCESS_TOKEN_EXPIRE_DAYS` ao `config.py`
-- [ ] Registrar `JWTMiddleware` no `main.py`
-- [ ] Implementar rotas de autenticação (`/auth/register`, `/auth/login`)
-- [ ] Implementar rotas CRUD de trips, places e itinerary items
-- [ ] Migrations Alembic
-
-### Pendente no frontend
-- [ ] Ativar `VITE_USE_BACKEND=true` e conectar trips ao backend quando rotas estiverem prontas
-- [ ] Serviço HTTP para itinerary items (atualmente só cache local)
-- [ ] Serviço HTTP para places salvos por viagem
+| Serviço | Uso |
+|---|---|
+| Google Gemini (gemini-2.0-flash) | Geração de roteiros com IA |
+| ExchangeRate API | Taxas de câmbio em tempo real para o conversor |
+| OpenStreetMap / Leaflet | Mapas interativos e visualização de lugares |
+| Supabase | PostgreSQL gerenciado em produção |
+| Unsplash (opcional) | Fotos de capa automáticas para viagens |
 
 ---
 
 ## Equipe
 
-- Augusto Cesar Rodrigues Xavier — backend, modelos, infraestrutura
-- Stephanie Adriane — frontend, autenticação, UI/UX
+- **Augusto Cesar Rodrigues Xavier** — backend, modelos, infraestrutura
+- **Stephanie Adriane** — frontend, autenticação, UI/UX

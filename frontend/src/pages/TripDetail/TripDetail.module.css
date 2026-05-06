@@ -13,36 +13,40 @@
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(10, 18, 40, 0.72) 0%,
-    rgba(10, 18, 40, 0.25) 50%,
-    transparent 100%
-  );
+  background: rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: flex-end;
-  padding: var(--space-6) var(--space-8);
 }
 
 .heroContent {
+  width: 100%;
+  padding: var(--space-16) var(--space-8) var(--space-6);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.45) 50%,
+    transparent 100%
+  );
   color: #fff;
 }
 
 .heroTitle {
+  color: #fff;
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   letter-spacing: -0.03em;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 .heroSubtitle {
   font-size: var(--font-size-base);
-  opacity: 0.80;
+  color: rgba(255, 255, 255, 0.88);
   margin-top: var(--space-1);
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Main layout ─────────────────────────────────────── */

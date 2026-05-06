@@ -1,83 +1,218 @@
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.55), 0 6px 20px rgba(99,102,241,0.3); }
+  50%       { box-shadow: 0 0 38px rgba(99,102,241,0.75), 0 6px 28px rgba(99,102,241,0.5); }
+}
+
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(30px, -20px) scale(1.06); }
+}
+
+/* ── Page ────────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
-  background: var(--gradient-dark);
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Image panel (full-screen background) ────────────────── */
+.imagePanel {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/login-hero.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* ── Form panel (left, overlaid on image) ────────────────── */
+.formPanel {
+  position: relative;
+  z-index: 1;
+  width: 38%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
+  justify-content: flex-end;
+  padding: var(--space-4) 48px var(--space-4) var(--space-4);
+  overflow: hidden;
+  text-align: left;
+
 }
 
+/* ── Card ────────────────────────────────────────────────── */
 .card {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.97);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-2xl);
-  padding: var(--space-8);
-  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.06);
-  backdrop-filter: blur(12px);
+  max-width: 408px;
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+  padding: 40px 40px 36px;
+  box-shadow: none;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ── Brand ───────────────────────────────────────────────── */
 .brand {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-6);
+  margin-bottom: 28px;
   text-align: center;
 }
 
 .logoMark {
-  width: 48px;
-  height: 48px;
-  background: var(--gradient-brand);
-  border-radius: var(--radius-xl);
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #4338ca 0%, #7c3aed 60%, #6d28d9 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  box-shadow: var(--shadow-primary);
-  margin-bottom: var(--space-1);
+  font-size: 1.6rem;
+  margin-bottom: var(--space-2);
+  animation: logoGlow 3.5s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+
+.logoMark:hover {
+  transform: scale(1.06) rotate(-4deg);
 }
 
 .title {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  letter-spacing: -0.03em;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin: 0;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 55%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  color: #64748b;
+  letter-spacing: 0.01em;
+  margin-top: 2px;
 }
 
+/* ── Form ────────────────────────────────────────────────── */
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 18px;
 }
 
+.form input {
+  border-radius: 12px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  padding: 11px 14px !important;
+  font-size: 0.9375rem !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+  outline: none !important;
+}
+
+.form input:hover {
+  border-color: #c7d2fe !important;
+  background: #fff !important;
+}
+
+.form input:focus {
+  border-color: #6366f1 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3.5px rgba(99,102,241,0.14) !important;
+}
+
+.form input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.form button[type="submit"] {
+  margin-top: 4px;
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 55%, #7c3aed 100%) !important;
+  box-shadow: 0 4px 18px rgba(99,102,241,0.42), 0 1px 3px rgba(0,0,0,0.1) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 13px 20px !important;
+  font-size: 0.9375rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  color: #fff !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.form button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(99,102,241,0.55), 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
+.form button[type="submit"]:active:not(:disabled) {
+  transform: scale(0.98) translateY(0) !important;
+  box-shadow: 0 2px 10px rgba(99,102,241,0.35) !important;
+}
+
+.form button[type="submit"]:disabled {
+  opacity: 0.55 !important;
+}
+
+/* ── Error message ───────────────────────────────────────── */
 .errorMsg {
-  font-size: var(--font-size-sm);
-  color: var(--color-danger);
-  background: var(--color-danger-light);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
+  font-size: 0.8125rem;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 10px 14px;
 }
 
+/* ── Footer ──────────────────────────────────────────────── */
 .footer {
-  margin-top: var(--space-5);
+  margin-top: 22px;
   text-align: center;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
 .link {
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .link:hover {
+  color: #7c3aed;
   text-decoration: underline;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .formPanel {
+    width: 100%;
+  }
+
+  .card {
+    padding: 32px 24px 28px;
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
 }
