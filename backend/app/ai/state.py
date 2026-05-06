@@ -9,7 +9,7 @@ class TravelPlanState(TypedDict, total=False):
     country_info: dict[str, Any]           # from services.country
     saved_places: list[dict[str, Any]]     # user's saved places
     preferences: str                       # free-text user preferences
-
+    prompt: str                            # rendered LLM prompt (set by build_prompt_node)
     raw_plan: str                          # raw LLM JSON string
     structured_plan: list[dict[str, Any]]  # validated days[]
     attempts: int                          # retry counter (max 1 refine)
