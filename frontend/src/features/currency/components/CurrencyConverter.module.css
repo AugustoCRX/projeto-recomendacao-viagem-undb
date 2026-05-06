@@ -83,12 +83,12 @@
 
 .amountRow {
   display: flex;
+  flex-direction: column;
   gap: var(--space-2);
-  align-items: center;
 }
 
 .input {
-  flex: 1;
+  width: 100%;
   padding: var(--space-2) var(--space-3);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -110,6 +110,7 @@
 }
 
 .convertBtn {
+  width: 100%;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-lg);
   border: none;
