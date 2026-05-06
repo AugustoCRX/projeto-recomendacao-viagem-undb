@@ -46,6 +46,11 @@ PUBLIC_PATHS: frozenset[str] = frozenset(
 
 class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # CORS preflight requests never carry Authorization — must pass through
+        # so the CORSMiddleware downstream can answer with the right headers.
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         path = request.url.path
 
         # Allow public routes through without a token
