@@ -92,14 +92,14 @@ async def generate_plan_node(state: TravelPlanState) -> dict[str, Any]:
     from langchain_core.messages import HumanMessage
     from langchain_google_genai import ChatGoogleGenerativeAI
 
-    from core.config import GOOGLE_API_KEY
+    from core.config import GOOGLE_API_KEY, GEMINI_MODEL
 
     api_key = str(GOOGLE_API_KEY)
     if not api_key:
         return {"error": "GOOGLE_API_KEY not configured"}
 
     llm = ChatGoogleGenerativeAI(
-        model="GEMINI_MODEL",
+        model=GEMINI_MODEL,
         temperature=0.7,
         google_api_key=api_key,
     )
