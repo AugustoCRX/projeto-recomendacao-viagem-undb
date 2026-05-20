@@ -76,10 +76,10 @@ export function CurrencyConverter({ initialFrom }) {
         {result && (
           <div className={styles.result}>
             <p className={styles.resultValue}>
-              {CURRENCY_FLAGS[result.to]} {Number(result.result).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.to}
+              {CURRENCY_FLAGS[result.target]} {Number(result.converted).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.target}
             </p>
             <p className={styles.resultRate}>
-              1 {result.from} = {Number(result.rate).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 6 })} {result.to}
+              1 {result.base} = {Number(result.rate).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 6 })} {result.target}
             </p>
           </div>
         )}

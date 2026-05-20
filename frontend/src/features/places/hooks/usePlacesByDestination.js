@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
-import { geocodeCity } from '@/services/api/geocoding';
-import { getAllPlaces } from '@/services/api/overpass';
+import { getPlacesByDestination } from '@/services/api/places';
+
+const TYPES = ['tourist_attraction', 'restaurant', 'lodging'];
+
+function mapPlace(p) {
+  return {
+    id: p.place_id,
+    name: p.name,
+    type: p.category,
+    address: p.address ?? null,
+    lat: p.lat,
+    lng: p.lng,
+    website: p.tags?.website ?? p.tags?.['contact:website'] ?? null,
+    openingHours: p.tags?.opening_hours ?? null,
+  };
+}
 
 export function usePlacesByDestination(destination) {
   const [placesByType, setPlacesByType] = useState({});
@@ -14,10 +28,18 @@ export function usePlacesByDestination(destination) {
     setError(null);
     setPlacesByType({});
 
-    geocodeCity(destination)
-      .then(({ lat, lng }) => getAllPlaces(lat, lng))
-      .then((data) => { if (active) setPlacesByType(data); })
-      .catch(() => { if (active) setError('Não foi possível carregar os pontos de interesse.'); })
+    Promise.all(TYPES.map((type) => getPlacesByDestination(destination, type)))
+      .then((results) => {
+        if (!active) return;
+        const grouped = {};
+        TYPES.forEach((type, i) => {
+          grouped[type] = results[i].map(mapPlace);
+        });
+        setPlacesByType(grouped);
+      })
+      .catch(() => {
+        if (active) setError('Não foi possível carregar os pontos de interesse.');
+      })
       .finally(() => { if (active) setLoading(false); });
 
     return () => { active = false; };

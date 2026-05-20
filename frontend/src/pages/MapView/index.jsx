@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { Button, Spinner } from '@/components/ui';
 import { useTripDetail } from '@/features/trips/hooks/useTripDetail';
 import { useGeocode } from '@/features/map/hooks/useGeocode';
-import { useOverpassPlaces } from '@/features/map/hooks/useOverpassPlaces';
+import { usePlacesByDestination } from '@/features/places/hooks/usePlacesByDestination';
 import { useSavedPlaces } from '@/features/places/hooks/useSavedPlaces';
 import { ROUTES } from '@/constants';
 // Pontos de interesse vêm da Overpass API (OpenStreetMap), sem mock
@@ -78,7 +78,7 @@ export default function MapViewPage() {
   const { id } = useParams();
   const { trip, loading: tripLoading } = useTripDetail(id);
   const { coords, loading: geoLoading, error: geoError } = useGeocode(trip?.destination);
-  const { places, loading: placesLoading, error: placesError } = useOverpassPlaces(coords);
+  const { placesByType: places, loading: placesLoading, error: placesError } = usePlacesByDestination(trip?.destination);
   const { isSaved, getSavedId, savePlace, removePlace, pending } = useSavedPlaces(trip?.id);
 
   const [activeTypes, setActiveTypes] = useState(new Set(TYPES));
